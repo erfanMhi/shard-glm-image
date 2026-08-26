@@ -30,6 +30,14 @@ COPY root/ /root/
 COPY scripts/*.sh /root/
 RUN chmod +x /root/*.sh
 
+# sshd StrictModes off. On the team vast account the key is injected per instance (vastai attach ssh) and arrived
+# with modes sshd rejects ("bad ownership or modes for file /root/.ssh/authorized_keys", 2026-08-26). The box is
+# ephemeral and root-only, so the check buys nothing here. Both the main config and the drop-in dir are set.
+RUN sed -i 's/^#\?StrictModes.*/StrictModes no/' /etc/ssh/sshd_config \
+    && grep -q '^StrictModes no' /etc/ssh/sshd_config || echo 'StrictModes no' >> /etc/ssh/sshd_config; \
+    mkdir -p /etc/ssh/sshd_config.d && echo 'StrictModes no' > /etc/ssh/sshd_config.d/10-vast-keys.conf \
+    && chown root:root /root && chmod 700 /root
+
 ENV HF_HUB_ENABLE_HF_TRANSFER=1 \
     GLM_DIR=/root/glm52nvfp4
 
