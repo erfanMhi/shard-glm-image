@@ -218,6 +218,8 @@ def main():
     ap.add_argument("--skip-fetch", action="store_true")
     ap.add_argument("--stage-timeout", type=int, default=2400, help="seconds to wait for a stage to print WARM")
     ap.add_argument("--allow-any-label", action="store_true", help="operate on instances whose label is not erfan-*")
+    ap.add_argument("--auto-coord", action="store_true", help="after the RTT mesh, pick the coordinator that minimizes the loop cost (overrides --coord-id)")
+    ap.add_argument("--mesh-only", action="store_true", help="measure the mesh, print the ring choice, write manifest, and exit")
     a = ap.parse_args()
     ids = [int(x) for x in a.ids.split(",") if x.strip()]
     if a.coord_id not in ids: raise SystemExit("--coord-id must be one of --ids")
@@ -247,6 +249,14 @@ def main():
         rtt = mesh(nodes, a.out, a.remesh)
         for n, row in zip(nodes, rtt): log("    " + f"{n['id']:>9} " + " ".join(f"{x:6.1f}" for x in row))
         log("[4] topology (shard.topology.optimal_loop, coordinator as depot)")
+        if a.auto_coord:
+            cands = []
+            for ci in range(len(nodes)):
+                o, c = LS.solve_order(rtt, ci); cands.append((c, ci, o))
+                log(f"    depot {nodes[ci]['id']} ({nodes[ci].get('geolocation')}): loop {c:.1f} ms")
+            cands.sort(); a.coord_id = nodes[cands[0][1]]["id"]; coord = nodes[cands[0][1]]
+            manifest["auto_coord"] = [{"id": nodes[ci]["id"], "geo": nodes[ci].get("geolocation"), "loop_ms": round(c, 1)} for c, ci, o in cands]
+            log(f"    -> coordinator {a.coord_id} ({coord.get('geolocation')})")
         order, cost = LS.solve_order(rtt, ids.index(a.coord_id))
         log(f"    loop cost {cost:.1f} ms; stage order: {[nodes[i]['id'] for i in order]} ({[nodes[i].get('geolocation') for i in order]})")
     chain = LS.assign_layers(order, nodes, NLAYERS)
@@ -254,6 +264,10 @@ def main():
     manifest["loop_cost_ms"] = cost
     for i, (inst, blk) in enumerate(chain): log(f"    stage{i}: {inst['id']} ({inst.get('geolocation')}) layers {blk[0]}-{blk[-1]}")
     log(f"    coord: {coord['id']} ({coord.get('geolocation')}) ret {ep(coord)}")
+    manifest["coord_id"] = coord["id"]; manifest["order_ids"] = [inst["id"] for inst, _ in chain]
+    json.dump(manifest, open(os.path.join(a.out, "manifest.json"), "w"), indent=1)
+    if a.mesh_only:
+        log(f"[mesh-only] coord {coord['id']} order {manifest['order_ids']} -> {a.out}/manifest.json"); return
 
     if not a.skip_fetch:
         log("[6] node_fetch (parallel; idempotent)")
