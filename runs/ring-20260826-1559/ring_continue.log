@@ -1,27 +1,45 @@
-[17:04:03 +0m] mesh (remeasured with the replacement box; coordinator fixed to 48813807)
-17:04:03 [1] instances
-17:04:04 [2] image check (vmoe venv + scripts)
-17:04:11 [3] RTT mesh
-17:04:32 [4] topology (shard.topology.optimal_loop, coordinator as depot)
-17:04:32     loop cost 195.3 ms; stage order: [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] (['Massachusetts, US', 'Maryland, US', 'Texas, US', 'California, US', 'North Carolina, US', 'Virginia, US'])
-17:04:32     stage0: 48813798 (Massachusetts, US) layers 0-12
-17:04:32     stage1: 48813802 (Maryland, US) layers 13-25
-17:04:32     stage2: 48813794 (Texas, US) layers 26-38
-17:04:32     stage3: 48813788 (California, US) layers 39-51
-17:04:32     stage4: 48813796 (North Carolina, US) layers 52-64
-17:04:32     stage5: 48816112 (Virginia, US) layers 65-77
-17:04:32     coord: 48813807 (New York, US) ret 38.82.223.83:61608
-17:04:32 [mesh-only] coord 48813807 order [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh2/manifest.json
-[17:04:32 +0m] MESH coord=48813807 order=48813798,48813802,48813794,48813788,48813796,48816112
-[17:04:32 +0m] RUN plain x3
-17:04:32 [1] instances
-17:04:33 [2] image check (vmoe venv + scripts)
-17:04:40 [3-4] explicit ring order: [48813798, 48813802, 48813794, 48813788, 48813796, 48816112]
-17:04:40     stage0: 48813798 (Massachusetts, US) layers 0-12
-17:04:40     stage1: 48813802 (Maryland, US) layers 13-25
-17:04:40     stage2: 48813794 (Texas, US) layers 26-38
-17:04:40     stage3: 48813788 (California, US) layers 39-51
-17:04:40     stage4: 48813796 (North Carolina, US) layers 52-64
-17:04:40     stage5: 48816112 (Virginia, US) layers 65-77
-17:04:40     coord: 48813807 (New York, US) ret 38.82.223.83:61608
-17:04:40 [6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first
+[17:06:18 +0m] mesh (remeasured with the replacement box; coordinator fixed to 48813807)
+17:06:18 [1] instances
+17:07:21 [2] image check (vmoe venv + scripts)
+17:07:28 [3] RTT mesh
+17:07:49 [4] topology (shard.topology.optimal_loop, coordinator as depot)
+17:07:49     loop cost 197.4 ms; stage order: [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] (['Massachusetts, US', 'Maryland, US', 'Texas, US', 'California, US', 'North Carolina, US', 'Virginia, US'])
+17:07:49     stage0: 48813798 (Massachusetts, US) layers 0-12
+17:07:49     stage1: 48813802 (Maryland, US) layers 13-25
+17:07:49     stage2: 48813794 (Texas, US) layers 26-38
+17:07:49     stage3: 48813788 (California, US) layers 39-51
+17:07:49     stage4: 48813796 (North Carolina, US) layers 52-64
+17:07:49     stage5: 48816112 (Virginia, US) layers 65-77
+17:07:49     coord: 48813807 (New York, US) ret 38.82.223.83:61608
+17:07:49 [mesh-only] coord 48813807 order [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh2/manifest.json
+[17:07:49 +1m] MESH coord=48813807 order=48813798,48813802,48813788,48813794,48816112,48813796
+[17:07:49 +1m] RUN plain x3
+17:07:49 [1] instances
+17:07:50 [2] image check (vmoe venv + scripts)
+17:07:57 [3-4] explicit ring order: [48813798, 48813802, 48813788, 48813794, 48816112, 48813796]
+17:07:57     stage0: 48813798 (Massachusetts, US) layers 0-12
+17:07:57     stage1: 48813802 (Maryland, US) layers 13-25
+17:07:57     stage2: 48813788 (California, US) layers 26-38
+17:07:57     stage3: 48813794 (Texas, US) layers 39-51
+17:07:57     stage4: 48816112 (Virginia, US) layers 52-64
+17:07:57     stage5: 48813796 (North Carolina, US) layers 65-77
+17:07:57     coord: 48813807 (New York, US) ret 38.82.223.83:61608
+17:07:57 [6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first
+17:08:21     48813798: OK done model-00005-of-00045.safetensors |   done model-00006-of-00045.safetensors |   done model-00007-of-00045.safetensors | shards: 69.82 GB in 3s = 23238 MB/s | total: 69.84 GB in 9s = 7409 MB/s | NODE_FETCH_DONE
+17:08:21     48813802: OK done model-00012-of-00045.safetensors |   done model-00013-of-00045.safetensors |   done model-00014-of-00045.safetensors | shards: 79.98 GB in 3s = 26496 MB/s | total: 80.01 GB in 10s = 8034 MB/s | NODE_FETCH_DONE
+17:08:21     48813788: OK done model-00020-of-00045.safetensors |   done model-00021-of-00045.safetensors |   done model-00022-of-00045.safetensors | shards: 89.97 GB in 6s = 14982 MB/s | total: 89.99 GB in 13s = 7011 MB/s | NODE_FETCH_DONE
+17:08:21     48813794: OK done model-00027-of-00045.safetensors |   done model-00028-of-00045.safetensors |   done model-00029-of-00045.safetensors | shards: 79.98 GB in 3s = 26611 MB/s | total: 80.00 GB in 10s = 8259 MB/s | NODE_FETCH_DONE
+17:08:21     48816112: OK done model-00035-of-00045.safetensors |   done model-00036-of-00045.safetensors |   done model-00037-of-00045.safetensors | shards: 89.81 GB in 6s = 14963 MB/s | total: 158.23 GB in 13s = 12527 MB/s | NODE_FETCH_DONE
+17:08:21     48813796: OK done model-00042-of-00045.safetensors |   done model-00043-of-00045.safetensors |   done model-00044-of-00045.safetensors | shards: 78.40 GB in 3s = 26068 MB/s | total: 78.42 GB in 10s = 8073 MB/s | NODE_FETCH_DONE
+17:08:21     48813807: OK done special_tokens_map.json |   done tokenizer.json |   done tokenizer_config.json | draft: 18.82 GB in 6s = 3096 MB/s | total: 39.18 GB in 21s = 1832 MB/s | NODE_FETCH_DONE
+17:08:21 [7] stages (relay-back chain; trace=False)
+[17:09:55 +3m] FAILED mode plain
+    destroyed 48813788 (erfan-glm-ring-california, was running)
+    destroyed 48813794 (erfan-glm-ring-texas, was running)
+    destroyed 48813796 (erfan-glm-ring-north_carolina, was running)
+    destroyed 48813798 (erfan-glm-ring-massachusetts, was running)
+    destroyed 48813802 (erfan-glm-ring-maryland, was running)
+    destroyed 48813807 (erfan-glm-ring-new_york, was running)
+    destroyed 48816112 (erfan-glm-ring-virginia, was running)
+    erfan-glm-* remaining: []
+[17:10:07 +3m] DESTROYED

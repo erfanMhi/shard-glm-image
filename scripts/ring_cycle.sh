@@ -8,9 +8,9 @@ STAMP=$(date +%Y%m%d-%H%M); RUNS=${RUNS:-$IMG/runs/ring-$STAMP}; mkdir -p "$RUNS
 CAP_S=${CAP_S:-10800}; T0=$(date +%s); N=${N:-7}; RUNS_PER=${RUNS_PER:-3}; PROMPT=${PROMPT:-"def quicksort(arr):"}; MAXNEW=${MAXNEW:-96}
 log() { echo "[$(date '+%H:%M:%S') +$(( ($(date +%s)-T0)/60 ))m] $*"; }
 teardown() { bash "$HERE/ring_down.sh" 2>&1 | sed 's/^/    /'; log "DESTROYED"; }
-fail() { log "FAILED $*"; teardown; exit 1; }
+fail() { log "FAILED $*"; if [ -n "${FAIL_TEARDOWN:-}" ]; then teardown; else log "ring LEFT UP for inspection (set FAIL_TEARDOWN=1 to tear down on failure); run scripts/ring_down.sh when done"; fi; exit 1; }
 trap 'fail signal' INT TERM
-budget() { [ $(( $(date +%s) - T0 )) -ge $CAP_S ] && fail "hard cap ${CAP_S}s"; }
+budget() { [ $(( $(date +%s) - T0 )) -ge $CAP_S ] && { log "FAILED hard cap ${CAP_S}s"; teardown; exit 1; }; }   # the cap always tears down
 LR() { budget; python3 "$HERE/launch_ring.py" --ids "$IDS" --coord-id "$COORD" --prompt "$PROMPT" --max-new "$MAXNEW" "$@" 2>&1 | tee -a "$RUNS/launch.log" | grep -E "^\S+ (\[|    ->|       time|    stage|    loop|    ->)" ; return ${PIPESTATUS[0]}; }
 
 SPARE=${SPARE:-1}; log "rent $((N+SPARE)) boxes ($N needed, $SPARE spare against slow image pulls)"; bash "$HERE/ring_up.sh" "$((N+SPARE))" 2>&1 | tee "$RUNS/ring_up.log" | sed 's/^/    /'
@@ -33,7 +33,7 @@ for round in 1 2; do
   APPEND=1 EXCLUDE_HOSTS="$EXCLUDE_HOSTS" bash "$HERE/ring_up.sh" "$need" 2>&1 | tee -a "$RUNS/ring_up.log" | sed 's/^/    /'
   wait_boxes 900
 done
-wait 2>/dev/null
+kill $(jobs -p) 2>/dev/null; wait 2>/dev/null   # stop waiting on boxes that never booted
 KEEP=$(grep -l READY "$RUNS"/wait_*.txt | head -n "$N" | sed 's/.*wait_\([0-9]*\)\.txt/\1/' | paste -sd, -)
 READY=$(echo "$KEEP" | tr ',' '\n' | grep -c .); log "READY $READY/$N kept: $KEEP"; cat "$RUNS"/wait_*.txt | sed 's/^/    /'
 [ "$READY" -ge "$N" ] || fail "only $READY boxes reachable after top-ups"
@@ -58,10 +58,10 @@ COORD=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["coord_i
 ORDER=$(python3 -c 'import json,sys; print(",".join(map(str,json.load(open(sys.argv[1]))["order_ids"])))' "$RUNS/mesh/manifest.json")
 log "MESH coord=$COORD order=$ORDER"
 
-# ladder: relay class first (plain, relay6), then ring class (direct6, pipe, cg). Fetch happens in the first call.
-for MODE in plain relay6 direct6 pipe cg; do
-  log "RUN $MODE x$RUNS_PER"; cp -n "$RUNS/mesh/mesh_rtt.json" "$RUNS/$MODE/" 2>/dev/null; mkdir -p "$RUNS/$MODE"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/$MODE/"
-  LR --mode "$MODE" --runs "$RUNS_PER" --order "$ORDER" $([ "$MODE" != plain ] && echo --skip-fetch) --out "$RUNS/$MODE" || fail "mode $MODE"
+# ladder, headline first: ring class (cg, pipe, direct6), then relay class (relay6, plain). Fetch happens in the first call.
+for MODE in cg pipe direct6 relay6 plain; do
+  log "RUN $MODE x$RUNS_PER"; mkdir -p "$RUNS/$MODE"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/$MODE/"
+  LR --mode "$MODE" --runs "$RUNS_PER" --order "$ORDER" $([ "$MODE" != cg ] && echo --skip-fetch) --out "$RUNS/$MODE" || fail "mode $MODE"
 done
 log "RUN cgeager x1 (receipt's lossless reference) + cg --trace x1 (instrumented)"
 mkdir -p "$RUNS/cgeager" "$RUNS/cgtrace"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/cgeager/"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/cgtrace/"

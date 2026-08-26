@@ -95,7 +95,10 @@ def ssh_cmd(inst):
     return ["ssh", "-i", KEY, "-p", str(inst["ports"]["22/tcp"][0]["HostPort"])] + LS.SSHO + [f"root@{inst['public_ipaddr']}"]
 
 def rssh(inst, cmd, timeout=120):
-    r = subprocess.run(ssh_cmd(inst) + [cmd], capture_output=True, text=True, timeout=timeout)
+    try:
+        r = subprocess.run(ssh_cmd(inst) + [cmd], capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired as e:
+        return 124, (e.stdout or b"").decode(errors="replace") if isinstance(e.stdout, bytes) else (e.stdout or ""), f"ssh timeout after {timeout}s"
     return r.returncode, r.stdout, r.stderr
 
 def scp_from(inst, remote_paths, dest):
@@ -136,9 +139,13 @@ def mesh(nodes, out_dir, remesh):
 def stage_launch_cmd(blk, nxt, ring, trace):
     args = f"stage --layers {' '.join(map(str, blk))} --port {STAGE_PORT}" + (f" --next {nxt}" if nxt else "") + (" --ring" if ring else "")
     env = "STAGE_TRACE=/root/stage_trace.jsonl " if trace else ""
-    return (REAP + "rm -f /root/stage.log /root/stage_trace.jsonl; cd /root && "
-            f"echo {shlex.quote(('ring' if ring else 'relay') + ' ' + args)} > /root/stage.class && "
-            f"setsid env {env}{PY} glm_swarm_nvfp4_kv.py {args} > /root/stage.log 2>&1 < /dev/null & echo launched")
+    # NOTE: no `&&` before the `&`: `a && b &` backgrounds the whole list as a subshell that keeps ssh's stdout open until
+    # the stage exits, so the ssh never returns (this hung every launch on 2026-08-26). Only the nohup'd stage goes to the
+    # background, with all three fds redirected.
+    return (REAP + "rm -f /root/stage.log /root/stage_trace.jsonl; cd /root; "
+            f"echo {shlex.quote(('ring' if ring else 'relay') + ' ' + args)} > /root/stage.class; "
+            f"nohup setsid env {env}{PY} glm_swarm_nvfp4_kv.py {args} > /root/stage.log 2>&1 < /dev/null & "
+            "sleep 1; echo launched")
 
 def stage_state(inst):
     rc, out, err = rssh(inst, "cat /root/stage.class 2>/dev/null; echo '|'; grep -c WARM /root/stage.log 2>/dev/null; echo '|'; "
@@ -162,7 +169,8 @@ def ensure_stages(chain, coord, ring, trace, timeout):
         todo.append((i, inst, blk, nxt))
     def launch(item):
         i, inst, blk, nxt = item
-        rssh(inst, stage_launch_cmd(blk, nxt, ring, trace), 90)
+        rc, out, err = rssh(inst, stage_launch_cmd(blk, nxt, ring, trace), 90)
+        if "launched" not in out: log(f"  stage{i} {inst['id']}: launch command did not confirm (rc {rc}): {(out + err)[-200:]}")
         return i
     if todo:
         for i, inst, blk, nxt in todo:
@@ -278,7 +286,7 @@ def main():
             return n["id"]
         pmap(push, nodes)
         tok = os.environ.get("HF_TOKEN")
-        envp = ("HF_XET_HIGH_PERFORMANCE=1 " + (f"HF_TOKEN={shlex.quote(tok)} " if tok else ""))   # hub 1.19 downloads via xet; HF_HUB_ENABLE_HF_TRANSFER is deprecated
+        envp = ("HF_HUB_DISABLE_XET=1 FETCH_MIN_MBPS=3 " + (f"HF_TOKEN={shlex.quote(tok)} " if tok else ""))   # plain HTTP: xet stalled at 0 MB/s on 4 boxes on 2026-08-26; plain gave 77-1200 MB/s
         def dl(item):
             inst, blk = item
             args = f"--coord --draft {a.draft_repo}" if blk is None else f"--layers {' '.join(map(str, blk))}"

@@ -7,18 +7,18 @@ HERE=$(cd "$(dirname "$0")" && pwd); RUNS=$1; IDS=$2; COORD=$3
 CAP_S=${CAP_S:-9000}; T0=$(date +%s); RUNS_PER=${RUNS_PER:-3}; PROMPT=${PROMPT:-"def quicksort(arr):"}; MAXNEW=${MAXNEW:-96}
 log() { echo "[$(date '+%H:%M:%S') +$(( ($(date +%s)-T0)/60 ))m] $*"; }
 teardown() { [ -n "${NO_TEARDOWN:-}" ] && { log "NO_TEARDOWN set; ring left up"; return; }; bash "$HERE/ring_down.sh" 2>&1 | sed 's/^/    /'; log "DESTROYED"; }
-fail() { log "FAILED $*"; teardown; exit 1; }
+fail() { log "FAILED $*"; if [ -n "${FAIL_TEARDOWN:-}" ]; then teardown; else log "ring LEFT UP for inspection (FAIL_TEARDOWN=1 to change); run scripts/ring_down.sh when done"; fi; exit 1; }
 trap 'fail signal' INT TERM
-budget() { [ $(( $(date +%s) - T0 )) -ge $CAP_S ] && fail "hard cap ${CAP_S}s"; }
+budget() { [ $(( $(date +%s) - T0 )) -ge $CAP_S ] && { log "FAILED hard cap ${CAP_S}s"; teardown; exit 1; }; }
 LR() { budget; python3 "$HERE/launch_ring.py" --ids "$IDS" --coord-id "$COORD" --prompt "$PROMPT" --max-new "$MAXNEW" "$@" 2>&1 | tee -a "$RUNS/launch2.log" | grep -E "^\S+ (\[|    ->|       time|    stage|    loop|    coord|    [0-9]+: )" ; return ${PIPESTATUS[0]}; }
 
 log "mesh (remeasured with the replacement box; coordinator fixed to $COORD)"
 mkdir -p "$RUNS/mesh2"; LR --mesh-only --remesh --out "$RUNS/mesh2" || fail "mesh"
 ORDER=${ORDER_OVERRIDE:-$(python3 -c 'import json,sys; print(",".join(map(str,json.load(open(sys.argv[1]))["order_ids"])))' "$RUNS/mesh2/manifest.json")}   # ORDER_OVERRIDE keeps the blocks the boxes already hold
 log "MESH coord=$COORD order=$ORDER"
-for MODE in plain relay6 direct6 pipe cg; do
+for MODE in cg pipe direct6 relay6 plain; do
   log "RUN $MODE x$RUNS_PER"; mkdir -p "$RUNS/$MODE"; cp "$RUNS/mesh2/mesh_rtt.json" "$RUNS/$MODE/"
-  LR --mode "$MODE" --runs "$RUNS_PER" --order "$ORDER" $([ "$MODE" != plain ] && echo --skip-fetch) --out "$RUNS/$MODE" || fail "mode $MODE"
+  LR --mode "$MODE" --runs "$RUNS_PER" --order "$ORDER" $([ "$MODE" != cg ] && echo --skip-fetch) --out "$RUNS/$MODE" || fail "mode $MODE"
 done
 log "RUN cgeager x1 + cg --trace x1"
 for M in cgeager cgtrace; do mkdir -p "$RUNS/$M"; cp "$RUNS/mesh2/mesh_rtt.json" "$RUNS/$M/"; done
