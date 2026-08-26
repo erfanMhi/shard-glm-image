@@ -16,7 +16,18 @@ for o in sorted(offers, key=lambda x: x["dph_total"]):
     st = (o.get("geolocation") or "").split(",")[0].strip()
     if st and st not in best: best[st] = o
 picks = [best[s] for s in pref if s in best][:n]
-for o in picks: print(o["id"], o["geolocation"].split(",")[0].strip().replace(" ", "_"), round(o["dph_total"], 3))
+# fewer states than boxes: fill with the next-cheapest offers on hosts not already picked (the receipt's ring had two
+# boxes in one state too; distinct hosts keep every hop a real WAN hop)
+hosts = {o["host_id"] for o in picks}
+for o in sorted(offers, key=lambda x: x["dph_total"]):
+    if len(picks) >= n: break
+    if o["host_id"] in hosts or o["id"] in {p["id"] for p in picks}: continue
+    picks.append(o); hosts.add(o["host_id"])
+seen = {}
+for o in picks:
+    st = o["geolocation"].split(",")[0].strip().replace(" ", "_") or "US"
+    seen[st] = seen.get(st, 0) + 1
+    print(o["id"], st + (str(seen[st]) if seen[st] > 1 else ""), round(o["dph_total"], 3))
 PY
 cnt=$(wc -l < /tmp/ring_pick.txt | tr -d ' '); [ "$cnt" -ge "$N" ] || { echo "only $cnt states available (need $N):"; cat /tmp/ring_pick.txt; exit 1; }
 tot=0

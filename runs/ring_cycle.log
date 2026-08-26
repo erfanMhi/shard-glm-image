@@ -1,0 +1,12 @@
+[15:34:42 +0m] rent 8 boxes (7 needed, 1 spare against slow image pulls)
+    only 7 states available (need 8):
+    35445739 California 1.669
+    48710423 Texas 1.402
+    47104051 Virginia 1.468
+    38606069 North_Carolina 1.241
+    39351028 Massachusetts 1.649
+    48780372 Maryland 1.66
+    47961772 Florida 2.001
+[15:34:43 +0m] FAILED rented fewer than 7
+    erfan-glm-* remaining: []
+[15:34:44 +0m] DESTROYED
