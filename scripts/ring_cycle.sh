@@ -25,8 +25,14 @@ COORD=$(awk 'NR==1{print $1}' "$RING_IDS")   # placeholder; --auto-coord picks t
 
 log "profile every box (parallel)"
 while read -r id st off pr; do R=$(grep -h READY "$RUNS/wait_$id.txt"); set -- $R; ip=$2; p22=$3
-  ( ssh -i ~/.ssh/id_ed25519 -p "$p22" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes root@"$ip" 'bash /root/profile_box.sh /root/profile.json >/dev/null 2>&1; python3 -c "import json;d=json.load(open(\"/root/profile.json\"));print(d.get(\"gpu\",{}).get(\"name\",\"?\"),d.get(\"gpu\",{}).get(\"power_limit_w\",\"?\"),\"W\", d.get(\"gpu_mem_bw_gbs\",\"?\"),\"GB/s\", d.get(\"pickle_ms\",\"?\"),\"ms pickle\")" 2>/dev/null' > "$RUNS/profile_$id.txt" 2>&1 ) &
-done < "$RING_IDS"; wait; for f in "$RUNS"/profile_*.txt; do echo "    $(basename $f .txt): $(cat $f | tail -1)"; done; log "PROFILED"
+  ( ssh -i ~/.ssh/id_ed25519 -p "$p22" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o BatchMode=yes root@"$ip" 'bash /root/profile_box.sh /root/profile.json >/dev/null 2>&1; python3 - /root/profile.json' <<'PY' > "$RUNS/profile_$id.txt" 2>&1
+import json, sys
+p = json.load(open(sys.argv[1])); g = (p.get("gpu") or [{}])[0]; t = p.get("torch") or {}
+print(g.get("name"), g.get("power_limit_W"), "W |", t.get("mem_bw_GBps_read_plus_write"), "GB/s |", (t.get("pickle_roundtrip_ms") or {}).get("p50"), "ms frame |",
+      (p.get("disk") or {}).get("read_MBps_direct"), "MB/s disk |", (p.get("sysctl") or {}).get("net.ipv4.tcp_slow_start_after_idle", "?").strip(), "ssai |", p.get("public_ip"))
+PY
+    scp -i ~/.ssh/id_ed25519 -P "$p22" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q root@"$ip":/root/profile.json "$RUNS/profile_$id.json" 2>/dev/null ) &
+done < "$RING_IDS"; wait; for f in "$RUNS"/profile_*.txt; do echo "    $(basename $f .txt): $(tail -1 $f)"; done; log "PROFILED"
 
 log "mesh + auto coordinator + fetch + ring up (cg class), no runs yet"
 LR --auto-coord --mesh-only --out "$RUNS/mesh" || fail "mesh"
