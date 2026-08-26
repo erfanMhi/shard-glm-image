@@ -14,7 +14,7 @@ import os, sys, json, time, argparse, subprocess, concurrent.futures as cf
 from huggingface_hub import HfApi
 
 TOKEN = os.environ.get("HF_TOKEN") or None
-MIN_MBPS = float(os.environ.get("FETCH_MIN_MBPS", "20"))   # a file slower than this (plus 90 s grace) is killed and retried
+MIN_MBPS = float(os.environ.get("FETCH_MIN_MBPS", "3"))    # per-file floor (plus 90 s grace); 8 parallel files on a ~1 Gbps box run at ~12-15 MB/s each, so 20 was too tight (2026-08-26)
 _SIZES = {}
 
 def repo_sizes(repo):

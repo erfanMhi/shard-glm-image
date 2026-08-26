@@ -1,0 +1,69 @@
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=17s status= ip= p22= p29= 
+t=32s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=50s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=66s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=81s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=97s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=112s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=128s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=143s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=159s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=175s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=191s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=206s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=222s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=238s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=253s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=269s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=285s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=300s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=316s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=332s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=347s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=363s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=379s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=394s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=410s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=426s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=441s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=457s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=473s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=488s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=504s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=520s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=535s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=551s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=567s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=582s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=598s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=614s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=629s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=645s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=661s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=677s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=692s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=708s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=723s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=739s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=755s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=770s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=786s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=802s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=817s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=833s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=849s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=864s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=880s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=896s status=loading ip=163.182.37.67 p22=None p29=None unable
+t=912s status=loading ip=163.182.37.67 p22=None p29=None unable

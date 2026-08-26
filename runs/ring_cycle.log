@@ -1,32 +1,49 @@
-[15:36:33 +0m] rent 8 boxes (7 needed, 1 spare against slow image pulls)
-    48811942 California 35445734 1.669
-    48811946 Texas 47660274 1.735
-    48811949 North_Carolina 38606069 1.241
-    48811952 Massachusetts 39351028 1.649
-    48811955 Maryland 48780365 1.66
-    48811959 Florida 47961772 2.001
-    48811961 New_York 42515648 1.26
-    48811964 US 41882843 1.006
-    rented 8 boxes, $12.221/h -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1536/ring_ids.txt
-[15:36:43 +0m] RENTED 48811942,48811946,48811949,48811952,48811955,48811959,48811961,48811964
-[15:36:43 +0m] wait for ssh (cap 20 min, parallel); keep the first 7 that come up
-[15:56:56 +20m] READY 6/7 kept: 48811942,48811946,48811949,48811952,48811955,48811959
-    READY 147.185.60.9 31641 39943 316
-    READY 154.59.156.39 51175 27550 331
-    READY 136.56.33.107 25297 25497 16
-    READY 216.193.128.133 42311 42356 221
-    READY 206.41.207.98 19075 28649 379
-    READY 8.17.147.71 30618 33227 284
-    TIMEOUT 
+[15:59:08 +0m] rent 8 boxes (7 needed, 1 spare against slow image pulls)
+    48813788 California 35445734 1.669 326136
+    48813794 Texas 48710423 1.336 553845
+    48813796 North_Carolina 38606069 1.241 34826
+    48813798 Massachusetts 39351028 1.674 337559
+    48813802 Maryland 48780368 1.66 411709
+    48813804 Florida 47961774 2.001 192026
+    48813807 New_York 47972967 1.38 234190
+    48813809 Ohio 47585465 1.041 444097
+    rented 8 boxes, $12.002/h -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/ring_ids.txt
+[15:59:18 +0m] RENTED 48813788,48813794,48813796,48813798,48813802,48813804,48813807,48813809
+[15:59:18 +0m] wait for ssh (cap 15 min, parallel); keep the first 7 that come up; boxes that never boot are replaced from other hosts
+[16:14:30 +15m] READY 7/7 kept: 48813788,48813794,48813796,48813798,48813802,48813804,48813807
+    READY 147.185.60.9 37626 38493 50
+    READY 208.68.65.246 7274 7356 207
+    READY 136.56.33.107 25771 25650 17
+    READY 216.193.128.133 42323 42320 32
+    READY 206.41.207.98 18975 30488 50
+    READY 8.17.147.71 31828 33842 32
+    READY 38.82.223.83 61310 61608 253
     TIMEOUT loading
-[15:56:56 +20m] FAILED only 6 boxes reachable
-    destroyed 48811942 (erfan-glm-ring-california, was running)
-    destroyed 48811946 (erfan-glm-ring-texas, was running)
-    destroyed 48811949 (erfan-glm-ring-north_carolina, was running)
-    destroyed 48811952 (erfan-glm-ring-massachusetts, was running)
-    destroyed 48811955 (erfan-glm-ring-maryland, was running)
-    destroyed 48811959 (erfan-glm-ring-florida, was running)
-    destroyed 48811961 (erfan-glm-ring-new_york, was loading)
-    destroyed 48811964 (erfan-glm-ring-us, was loading)
-    erfan-glm-* remaining: []
-[15:57:03 +20m] DESTROYED
+[16:14:30 +15m] release extra box 48813809
+    destroyed 48813809 (erfan-glm-ring-ohio, was loading)
+    erfan-glm-* remaining: [48813788, 48813794, 48813796, 48813798, 48813802, 48813804, 48813807]
+[16:14:31 +15m] profile every box (parallel)
+    profile_48813788: NVIDIA RTX PRO 6000 Blackwell Server Edition 600.00 W W | 1459.1 GB/s | 0.252 ms frame | 9984.7 MB/s disk | 1 ssai | 147.185.60.9
+    profile_48813794: NVIDIA RTX PRO 6000 Blackwell Workstation Edition 600.00 W W | 1467.0 GB/s | 0.234 ms frame | 10949.0 MB/s disk | 1 ssai | 208.68.65.246
+    profile_48813796: NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition 300.00 W W | 1467.2 GB/s | 0.246 ms frame | 8742.8 MB/s disk | 1 ssai | 136.56.33.107
+    profile_48813798: NVIDIA RTX PRO 6000 Blackwell Workstation Edition 550.00 W W | 1467.7 GB/s | 0.136 ms frame | 3353.7 MB/s disk | 1 ssai | 216.193.128.133
+    profile_48813802: NVIDIA RTX PRO 6000 Blackwell Server Edition 600.00 W W | 1461.7 GB/s | 0.219 ms frame | 5597.0 MB/s disk | 1 ssai | 206.41.207.98
+    profile_48813804: NVIDIA RTX PRO 6000 Blackwell Workstation Edition 570.00 W W | 1467.6 GB/s | 0.351 ms frame | 6311.8 MB/s disk | 1 ssai | 8.17.147.71
+    profile_48813807: NVIDIA RTX PRO 6000 Blackwell Server Edition 500.00 W W | 1460.0 GB/s | 0.407 ms frame | 9872.4 MB/s disk | 1 ssai | 38.82.223.83
+[16:14:42 +15m] PROFILED
+[16:14:43 +15m] mesh + auto coordinator + fetch + ring up (cg class), no runs yet
+16:14:43 [1] instances
+16:14:43 [2] image check (vmoe venv + scripts)
+16:14:50 [3] RTT mesh
+16:15:12 [4] topology (shard.topology.optimal_loop, coordinator as depot)
+16:15:12     -> coordinator 48813807 (New York, US)
+16:15:12     loop cost 212.6 ms; stage order: [48813798, 48813802, 48813788, 48813794, 48813804, 48813796] (['Massachusetts, US', 'Maryland, US', 'California, US', 'Texas, US', 'Florida, US', 'North Carolina, US'])
+16:15:12     stage0: 48813798 (Massachusetts, US) layers 0-12
+16:15:12     stage1: 48813802 (Maryland, US) layers 13-25
+16:15:12     stage2: 48813788 (California, US) layers 26-38
+16:15:12     stage3: 48813794 (Texas, US) layers 39-51
+16:15:12     stage4: 48813804 (Florida, US) layers 52-64
+16:15:12     stage5: 48813796 (North Carolina, US) layers 65-77
+16:15:12 [mesh-only] coord 48813807 order [48813798, 48813802, 48813788, 48813794, 48813804, 48813796] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh/manifest.json
+[16:15:12 +16m] MESH coord=48813807 order=48813798,48813802,48813788,48813794,48813804,48813796
+[16:15:12 +16m] RUN plain x3

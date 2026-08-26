@@ -1,0 +1,34 @@
+[16:24:20] 48813788: paused, 8 downloading, 0 shards complete
+[16:24:21] 48813794: paused, 8 downloading, 0 shards complete
+[16:24:21] 48813796: paused, 2 downloading, 6 shards complete
+[16:24:23] 48813798: paused, 7 downloading, 0 shards complete
+[16:24:28] 48813804: running, ? child, ? shards
+[16:24:50] 48813788: paused, 8 downloading, 0 shards complete
+[16:24:53] 48813794: paused, 8 downloading, 0 shards complete
+[16:24:54] 48813796: paused, 2 downloading, 6 shards complete
+[16:24:56] 48813798: paused, 7 downloading, 0 shards complete
+[16:25:02] 48813804: running, ? child, ? shards
+[16:25:24] 48813788: paused, 8 downloading, 0 shards complete
+[16:25:25] 48813794: paused, 8 downloading, 0 shards complete
+[16:25:25] 48813796: paused, 2 downloading, 6 shards complete
+[16:25:26] 48813798: paused, 6 downloading, 1 shards complete
+[16:25:31] 48813804: running, ? child, ? shards
+[16:25:53] 48813788: paused, 8 downloading, 0 shards complete
+[16:25:55] 48813794: paused, 4 downloading, 4 shards complete
+[16:25:56] 48813796: paused, 2 downloading, 6 shards complete
+[16:25:56] 48813798: paused, 5 downloading, 2 shards complete
+[16:26:04] 48813804: running, ? child, ? shards
+[16:26:26] 48813788: paused, 8 downloading, 0 shards complete
+[16:26:28] 48813794: paused, 3 downloading, 5 shards complete
+[16:26:29] 48813796: paused, 2 downloading, 6 shards complete
+[16:26:30] 48813798: paused, 5 downloading, 2 shards complete
+[16:26:37] 48813804: running, ? child, ? shards
+[16:27:00] 48813788: paused, 8 downloading, 0 shards complete
+[16:27:02] 48813794: children done (8 shards) -> CONT
+[16:27:03] 48813796: paused, 2 downloading, 6 shards complete
+[16:27:03] 48813798: paused, 5 downloading, 2 shards complete
+[16:27:08] 48813804: running, ? child, ? shards
+[16:27:31] 48813788: paused, 8 downloading, 0 shards complete
+[16:27:32] 48813796: paused, 2 downloading, 6 shards complete
+[16:27:33] 48813798: paused, 5 downloading, 2 shards complete
+[16:27:39] 48813804: running, ? child, ? shards
