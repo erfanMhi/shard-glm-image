@@ -10,21 +10,48 @@ Shards download in parallel (8 workers); each file keeps the resume + backoff re
 is honored when set (the tokenizer repo zai-org/GLM-5.2 may need it; anonymous pulls throttle).
 GLM_DIR overrides the target directory (default /root/glm52nvfp4).
 """
-import os, sys, json, time, argparse, concurrent.futures as cf
-from huggingface_hub import hf_hub_download, snapshot_download
-from huggingface_hub.utils import HfHubHTTPError
+import os, sys, json, time, argparse, subprocess, concurrent.futures as cf
+from huggingface_hub import HfApi
 
 TOKEN = os.environ.get("HF_TOKEN") or None
+MIN_MBPS = float(os.environ.get("FETCH_MIN_MBPS", "20"))   # a file slower than this (plus 90 s grace) is killed and retried
+_SIZES = {}
+
+def repo_sizes(repo):
+    """file -> bytes for the repo (one listing per repo)."""
+    if repo not in _SIZES:
+        try:
+            _SIZES[repo] = {e.path: (getattr(e, "size", None) or 0) for e in HfApi(token=TOKEN).list_repo_tree(repo, recursive=True)}
+        except Exception as e:
+            print(f"  warn: could not list {repo}: {str(e)[:80]}", flush=True); _SIZES[repo] = {}
+    return _SIZES[repo]
+
+_CHILD = ("import sys; from huggingface_hub import hf_hub_download; "
+          "hf_hub_download(sys.argv[1], sys.argv[2], local_dir=sys.argv[3], token=(sys.argv[4] or None))")
 
 def fetch(repo, f, tries=8, local_dir=None):
-    """Download with resume + backoff — no HF token means throttling/429 under fleet load."""
+    """Download one file in a child process with resume + backoff, killed if it runs past size/MIN_MBPS + 90 s.
+    A stall seen 2026-08-26: snapshot_download sat at 0 MB/s for 30 min on one 4.9 GB file (xet path). From the third
+    attempt on, HF_HUB_DISABLE_XET=1 forces the plain HTTP path; resume picks up the .incomplete blob."""
+    local_dir = local_dir or D
+    size = repo_sizes(repo).get(f, 0)
+    budget = 90 + size / (MIN_MBPS * 1e6)
     for i in range(tries):
-        try:
-            return hf_hub_download(repo, f, local_dir=local_dir or D, token=TOKEN)
-        except Exception as e:
-            wait = min(60, 5 * (i + 1))
-            print(f"  retry {f} ({i+1}/{tries}) after {wait}s: {str(e)[:80]}", flush=True)
-            time.sleep(wait)
+        env = dict(os.environ); env.pop("HF_HUB_ENABLE_HF_TRANSFER", None)
+        if i >= 2: env["HF_HUB_DISABLE_XET"] = "1"
+        p = subprocess.Popen([sys.executable, "-c", _CHILD, repo, f, local_dir, TOKEN or ""], env=env,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        t0 = time.time(); why = ""
+        while p.poll() is None:
+            time.sleep(3)
+            if time.time() - t0 > budget:
+                p.kill(); p.wait(); why = f"over budget {budget:.0f}s for {size/1e9:.2f} GB"; break
+        if p.returncode == 0 and os.path.exists(os.path.join(local_dir, f)):
+            return os.path.join(local_dir, f)
+        if not why: why = (p.stderr.read().decode(errors="replace").strip().splitlines() or ["?"])[-1][:100]
+        wait = min(60, 5 * (i + 1))
+        print(f"  retry {f} ({i+1}/{tries}) after {wait}s: {why}{' [xet off]' if i + 1 >= 2 else ''}", flush=True)
+        time.sleep(wait)
     raise RuntimeError(f"failed to fetch {f} after {tries} tries")
 
 def _dir_bytes(path):
@@ -99,18 +126,14 @@ if a.draft:
     if not a.coord:
         print("warn: --draft is a coordinator asset; fetching anyway", flush=True)
     print(f"draft fetch: {a.draft} -> {a.draft_dir}", flush=True)
-    t_dr = time.time()
-    for i in range(4):
-        try:
-            snapshot_download(a.draft, local_dir=a.draft_dir, token=TOKEN,
-                              allow_patterns=["*.safetensors", "*.json", "*.py", "*.txt", "*.model", "*.tiktoken"],
-                              max_workers=a.workers)
-            break
-        except Exception as e:
-            if i == 3: raise
-            wait = min(60, 10 * (i + 1))
-            print(f"  draft retry ({i+1}/4) after {wait}s: {str(e)[:80]}", flush=True)
-            time.sleep(wait)
+    t_dr = time.time(); os.makedirs(a.draft_dir, exist_ok=True)
+    exts = (".safetensors", ".json", ".py", ".txt", ".model", ".tiktoken")
+    dfiles = sorted(f for f in repo_sizes(a.draft) if f.endswith(exts) and not f.startswith("."))
+    if not dfiles: raise RuntimeError(f"no files listed for {a.draft}")
+    print(f"  {len(dfiles)} files, {sum(repo_sizes(a.draft)[f] for f in dfiles)/1e9:.1f} GB", flush=True)
+    with cf.ThreadPoolExecutor(max_workers=max(1, a.workers)) as ex:
+        for f in ex.map(lambda f: fetch(a.draft, f, local_dir=a.draft_dir), dfiles):
+            print("  done", os.path.basename(f), flush=True)
     report("draft", _dir_bytes(a.draft_dir), time.time() - t_dr)
 
 report("total", _dir_bytes(D) + (_dir_bytes(a.draft_dir) if a.draft else 0), time.time() - T0)

@@ -270,7 +270,13 @@ def main():
         log(f"[mesh-only] coord {coord['id']} order {manifest['order_ids']} -> {a.out}/manifest.json"); return
 
     if not a.skip_fetch:
-        log("[6] node_fetch (parallel; idempotent)")
+        log("[6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first")
+        nf = os.path.join(os.path.dirname(HERE), "root", "node_fetch.py")
+        def push(n):
+            port = str(n["ports"]["22/tcp"][0]["HostPort"])
+            subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [nf, f"root@{n['public_ipaddr']}:/root/node_fetch.py"], capture_output=True, timeout=120)
+            return n["id"]
+        pmap(push, nodes)
         tok = os.environ.get("HF_TOKEN")
         envp = ("HF_XET_HIGH_PERFORMANCE=1 " + (f"HF_TOKEN={shlex.quote(tok)} " if tok else ""))   # hub 1.19 downloads via xet; HF_HUB_ENABLE_HF_TRANSFER is deprecated
         def dl(item):
