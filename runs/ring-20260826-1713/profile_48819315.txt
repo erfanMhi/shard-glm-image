@@ -1,4 +1,0 @@
-Warning: Permanently added '[208.68.65.246]:7797' (ED25519) to the list of known hosts.
-Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
-Have fun!
-NVIDIA RTX PRO 6000 Blackwell Workstation Edition 600.00 W W | 1466.5 GB/s | 0.235 ms frame | 11073.1 MB/s disk | 1 ssai | 208.68.65.246

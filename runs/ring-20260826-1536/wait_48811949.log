@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "<string>", line 6, in <module>
-    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
-                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
-TypeError: 'NoneType' object is not subscriptable
-t=1s status= ip= p22= p29= 
