@@ -4,7 +4,7 @@
 # Writes ring_ids.txt (id state offer price) next to this script's runs dir. Preferred states first, then fallbacks.
 set -uo pipefail
 V=${VASTAI:-$HOME/.vastcli/bin/vastai}; HERE=$(cd "$(dirname "$0")" && pwd); N=${1:-7}; shift || true
-PREF=(${@:-California Nevada Texas Kentucky Virginia New_Jersey Massachusetts Maryland Florida Indiana North_Carolina New_York Utah})
+PREF=(${@:-California Nevada Texas Kentucky Virginia New_Jersey North_Carolina Massachusetts Maryland Florida Indiana New_York Utah})
 OUT=${RING_IDS:-$HERE/../runs/ring_ids.txt}; mkdir -p "$(dirname "$OUT")"; : > "$OUT"
 $V search offers 'gpu_name in ["RTX PRO 6000 WS","RTX PRO 6000 S"] geolocation in [US] rentable=true num_gpus=1 reliability2>=0.92 cuda_max_good>=13.0 disk_space>=150 inet_down>=500' --raw -o 'dph_total+' > /tmp/ring_offers.json 2>/dev/null
 python3 - "$N" "${PREF[@]}" > /tmp/ring_pick.txt <<'PY'

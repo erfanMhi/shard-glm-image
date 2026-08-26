@@ -13,14 +13,18 @@ trap 'fail signal' INT TERM
 budget() { [ $(( $(date +%s) - T0 )) -ge $CAP_S ] && fail "hard cap ${CAP_S}s"; }
 LR() { budget; python3 "$HERE/launch_ring.py" --ids "$IDS" --coord-id "$COORD" --prompt "$PROMPT" --max-new "$MAXNEW" "$@" 2>&1 | tee -a "$RUNS/launch.log" | grep -E "^\S+ (\[|    ->|       time|    stage|    loop|    ->)" ; return ${PIPESTATUS[0]}; }
 
-log "rent $N boxes"; bash "$HERE/ring_up.sh" "$N" 2>&1 | tee "$RUNS/ring_up.log" | sed 's/^/    /'
+SPARE=${SPARE:-1}; log "rent $((N+SPARE)) boxes ($N needed, $SPARE spare against slow image pulls)"; bash "$HERE/ring_up.sh" "$((N+SPARE))" 2>&1 | tee "$RUNS/ring_up.log" | sed 's/^/    /'
 [ "$(wc -l < "$RING_IDS" | tr -d ' ')" -ge "$N" ] || fail "rented fewer than $N"
-IDS=$(awk '{print $1}' "$RING_IDS" | paste -sd, -); log "RENTED $IDS"
+log "RENTED $(awk '{print $1}' "$RING_IDS" | paste -sd, -)"
 
-log "wait for ssh on all (cap 25 min each, parallel)"
-for id in $(awk '{print $1}' "$RING_IDS"); do ( bash "$IMG/../vast/wait_ssh.sh" "$id" 1500 > "$RUNS/wait_$id.txt" 2>"$RUNS/wait_$id.log" ) & done; wait
-READY=$(cat "$RUNS"/wait_*.txt | grep -c READY); log "READY $READY/$N"; cat "$RUNS"/wait_*.txt | sed 's/^/    /'
-[ "$READY" -ge "$N" ] || fail "only $READY boxes reachable"
+log "wait for ssh (cap 20 min, parallel); keep the first $N that come up"
+for id in $(awk '{print $1}' "$RING_IDS"); do ( bash "$IMG/../vast/wait_ssh.sh" "$id" 1200 > "$RUNS/wait_$id.txt" 2>"$RUNS/wait_$id.log" ) & done
+while :; do n=$(cat "$RUNS"/wait_*.txt 2>/dev/null | grep -c READY); [ "$n" -ge "$N" ] && break; [ "$(jobs -r | wc -l | tr -d ' ')" -eq 0 ] && break; sleep 10; done
+KEEP=$(grep -l READY "$RUNS"/wait_*.txt | head -n "$N" | sed 's/.*wait_\([0-9]*\)\.txt/\1/' | paste -sd, -)
+READY=$(echo "$KEEP" | tr ',' '\n' | grep -c .); log "READY $READY/$N kept: $KEEP"; cat "$RUNS"/wait_*.txt | sed 's/^/    /'
+[ "$READY" -ge "$N" ] || { wait; fail "only $READY boxes reachable"; }
+for id in $(awk '{print $1}' "$RING_IDS"); do case ",$KEEP," in *,$id,*) ;; *) log "release extra box $id"; bash "$HERE/ring_down.sh" "$id" | sed 's/^/    /';; esac; done
+grep -E "^($(echo "$KEEP" | tr ',' '|')) " "$RING_IDS" > "$RING_IDS.kept"; RING_IDS="$RING_IDS.kept"; IDS=$KEEP
 COORD=$(awk 'NR==1{print $1}' "$RING_IDS")   # placeholder; --auto-coord picks the real one
 
 log "profile every box (parallel)"
