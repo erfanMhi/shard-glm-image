@@ -1,0 +1,60 @@
+17:04:03 [1] instances
+17:04:04     48813798 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42320 ssh:42323
+17:04:04     48813802 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :30488 ssh:18975
+17:04:04     48813788 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :38493 ssh:37626
+17:04:04     48813794 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7356 ssh:7274
+17:04:04     48816112 label='erfan-glm-ring-virginia' Virginia, US RTX PRO 6000 S ip=3.87.0.12 :40082 ssh:40002
+17:04:04     48813796 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :25650 ssh:25771
+17:04:04     48813807 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61608 ssh:61310
+17:04:04 [2] image check (vmoe venv + scripts)
+17:04:11   48813798: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:04:11   48813802: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:04:11   48813788: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:04:11   48813794: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:04:11   48816112: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:04:11   48813796: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:04:11   48813807: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:04:11 [3] RTT mesh
+17:04:11 mesh: measuring all-pairs TCP connect RTT (kills any listener on :29600 first)
+17:04:32      48813798    0.3   11.6   71.5   49.2   10.9   31.9   10.4
+17:04:32      48813802   12.2    1.6   66.3   42.3   32.5   35.0    9.7
+17:04:32      48813788   70.3   65.9    0.5   53.4   68.2   63.2   63.6
+17:04:32      48813794   48.2   41.5   53.1    3.2   36.3   44.6   47.1
+17:04:32      48816112   11.4   32.9   67.8   35.6    0.1    8.9    6.4
+17:04:32      48813796   32.3   25.8   62.4   41.9    8.1    0.4   20.4
+17:04:32      48813807   10.6    9.1   63.5   47.7    6.6   20.6    0.1
+17:04:32 [4] topology (shard.topology.optimal_loop, coordinator as depot)
+17:04:32     loop cost 195.3 ms; stage order: [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] (['Massachusetts, US', 'Maryland, US', 'Texas, US', 'California, US', 'North Carolina, US', 'Virginia, US'])
+17:04:32     stage0: 48813798 (Massachusetts, US) layers 0-12
+17:04:32     stage1: 48813802 (Maryland, US) layers 13-25
+17:04:32     stage2: 48813794 (Texas, US) layers 26-38
+17:04:32     stage3: 48813788 (California, US) layers 39-51
+17:04:32     stage4: 48813796 (North Carolina, US) layers 52-64
+17:04:32     stage5: 48816112 (Virginia, US) layers 65-77
+17:04:32     coord: 48813807 (New York, US) ret 38.82.223.83:61608
+17:04:32 [mesh-only] coord 48813807 order [48813798, 48813802, 48813794, 48813788, 48813796, 48816112] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh2/manifest.json
+17:04:32 [1] instances
+17:04:33     48813798 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42320 ssh:42323
+17:04:33     48813802 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :30488 ssh:18975
+17:04:33     48813788 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :38493 ssh:37626
+17:04:33     48813794 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7356 ssh:7274
+17:04:33     48816112 label='erfan-glm-ring-virginia' Virginia, US RTX PRO 6000 S ip=3.87.0.12 :40082 ssh:40002
+17:04:33     48813796 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :25650 ssh:25771
+17:04:33     48813807 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61608 ssh:61310
+17:04:33 [2] image check (vmoe venv + scripts)
+17:04:40   48813798: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:04:40   48813802: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:04:40   48813788: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:04:40   48813794: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:04:40   48816112: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:04:40   48813796: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:04:40   48813807: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:04:40 [3-4] explicit ring order: [48813798, 48813802, 48813794, 48813788, 48813796, 48816112]
+17:04:40     stage0: 48813798 (Massachusetts, US) layers 0-12
+17:04:40     stage1: 48813802 (Maryland, US) layers 13-25
+17:04:40     stage2: 48813794 (Texas, US) layers 26-38
+17:04:40     stage3: 48813788 (California, US) layers 39-51
+17:04:40     stage4: 48813796 (North Carolina, US) layers 52-64
+17:04:40     stage5: 48816112 (Virginia, US) layers 65-77
+17:04:40     coord: 48813807 (New York, US) ret 38.82.223.83:61608
+17:04:40 [6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first

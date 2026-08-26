@@ -14,7 +14,7 @@ LR() { budget; python3 "$HERE/launch_ring.py" --ids "$IDS" --coord-id "$COORD" -
 
 log "mesh (remeasured with the replacement box; coordinator fixed to $COORD)"
 mkdir -p "$RUNS/mesh2"; LR --mesh-only --remesh --out "$RUNS/mesh2" || fail "mesh"
-ORDER=$(python3 -c 'import json,sys; print(",".join(map(str,json.load(open(sys.argv[1]))["order_ids"])))' "$RUNS/mesh2/manifest.json")
+ORDER=${ORDER_OVERRIDE:-$(python3 -c 'import json,sys; print(",".join(map(str,json.load(open(sys.argv[1]))["order_ids"])))' "$RUNS/mesh2/manifest.json")}   # ORDER_OVERRIDE keeps the blocks the boxes already hold
 log "MESH coord=$COORD order=$ORDER"
 for MODE in plain relay6 direct6 pipe cg; do
   log "RUN $MODE x$RUNS_PER"; mkdir -p "$RUNS/$MODE"; cp "$RUNS/mesh2/mesh_rtt.json" "$RUNS/$MODE/"

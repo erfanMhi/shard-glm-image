@@ -47,3 +47,14 @@
 16:15:12 [mesh-only] coord 48813807 order [48813798, 48813802, 48813788, 48813794, 48813804, 48813796] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh/manifest.json
 [16:15:12 +16m] MESH coord=48813807 order=48813798,48813802,48813788,48813794,48813804,48813796
 [16:15:12 +16m] RUN plain x3
+16:15:12 [1] instances
+16:15:13 [2] image check (vmoe venv + scripts)
+16:15:20 [3-4] explicit ring order: [48813798, 48813802, 48813788, 48813794, 48813804, 48813796]
+16:15:20     stage0: 48813798 (Massachusetts, US) layers 0-12
+16:15:20     stage1: 48813802 (Maryland, US) layers 13-25
+16:15:20     stage2: 48813788 (California, US) layers 26-38
+16:15:20     stage3: 48813794 (Texas, US) layers 39-51
+16:15:20     stage4: 48813804 (Florida, US) layers 52-64
+16:15:20     stage5: 48813796 (North Carolina, US) layers 65-77
+16:15:20 [6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first
+17:03:22 [7] stages (relay-back chain; trace=False)

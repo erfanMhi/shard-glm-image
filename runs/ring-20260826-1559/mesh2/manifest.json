@@ -2,25 +2,25 @@
  "args": {
   "ids": "48813798,48813802,48813788,48813794,48816112,48813796,48813807",
   "coord_id": 48813807,
-  "mode": "plain",
+  "mode": "cg",
   "prompt": "def quicksort(arr):",
   "max_new": 96,
   "runs": 3,
-  "out": "/private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/plain",
+  "out": "/private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1559/mesh2",
   "trace": false,
   "draft_repo": "zai-org/GLM-4-9B-0414",
   "K": null,
   "depth": 6,
-  "order": "48813798,48813802,48813794,48813788,48813796,48816112",
-  "remesh": false,
+  "order": "",
+  "remesh": true,
   "skip_fetch": false,
   "stage_timeout": 2400,
   "allow_any_label": false,
   "auto_coord": false,
-  "mesh_only": false
+  "mesh_only": true
  },
  "K": 2,
- "started": "2026-08-26T21:04:32Z",
+ "started": "2026-08-26T21:04:03Z",
  "nodes": [
   {
    "id": 48813798,
@@ -163,7 +163,7 @@
    "ep": "3.87.0.12:40082"
   }
  ],
- "loop_cost_ms": null,
+ "loop_cost_ms": 195.3,
  "coord_id": 48813807,
  "order_ids": [
   48813798,
