@@ -1,0 +1,234 @@
+"""Layer-block challenge — the compute-honesty spot-check (shard/challenge.py).
+
+This is the primitive that actually catches a node getting PAID WITHOUT running its block's real
+matmuls (the gap the receipt hash-chain and any token "endpoint binding" cannot close — a receipt
+chain only proves byte-continuity, never `out == block(in)`). A verifier draws a seeded input both
+sides derive identically, the suspect and a trusted replica each run the same block, and their
+outputs are compared by cosine similarity + relative norm with a tolerance (heterogeneous hardware
+drifts a few ULPs → cosine ~1.0; garbage or a wrong/skipped block → cosine ~0). It had ZERO tests.
+
+CPU, no model weights: the pure discriminators are tested directly, and challenge_block's orchestration
+with synthetic blocks (block_forward stubbed) — proving an honest recompute PASSES and a lazy /
+constant / wrong block FAILS.
+
+Run: python3 -m pytest tests/test_challenge.py -q
+"""
+import os
+import sys
+
+import pytest
+
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _REPO)
+
+torch = pytest.importorskip("torch")
+from shard import challenge as ch                    # noqa: E402
+
+
+# ---- 1. derive_challenge: deterministic + host-independent ------------------------------------------
+
+def test_derive_challenge_deterministic_same_seed():
+    a = ch.derive_challenge("seed-A", 5, 32, device="cpu", dtype=torch.float32)
+    b = ch.derive_challenge("seed-A", 5, 32, device="cpu", dtype=torch.float32)
+    assert torch.equal(a, b)                          # same seed -> identical bytes (verifier == node)
+    assert a.shape == (1, 5, 32)
+
+
+def test_derive_challenge_differs_by_seed():
+    a = ch.derive_challenge("seed-A", 5, 32, device="cpu", dtype=torch.float32)
+    b = ch.derive_challenge("seed-B", 5, 32, device="cpu", dtype=torch.float32)
+    assert not torch.equal(a, b)                      # a node can't precompute for an unknown seed
+
+
+# ---- 2. sketch: deterministic, compact -------------------------------------------------------------
+
+def test_sketch_is_deterministic_and_compact():
+    h = torch.randn(1, 8, 64)
+    s1, s2 = ch.sketch(h, seed="chal-1"), ch.sketch(h, seed="chal-1")
+    assert s1 == s2                                   # same per-challenge seed -> verifier & node project identically
+    assert s1["n"] == 8 * 64 and len(s1["proj"]) == min(256, 8 * 64)
+    assert abs(s1["norm"] - float(h.flatten().norm())) < 1e-2
+
+
+# ---- 3. compare: the discriminator (honest passes, cheat fails) ------------------------------------
+
+def test_compare_identical_passes():
+    h = torch.randn(1, 8, 64)
+    r = ch.compare(h, h.clone())
+    assert r["passed"] and r["cosine"] > 0.9999
+
+
+def test_compare_honest_ulp_drift_passes():
+    """Honest recompute on different hardware drifts a few ULPs — must PASS (else every honest node
+    on heterogeneous GPUs false-fails)."""
+    h = torch.randn(1, 16, 128)
+    drift = h + 1e-4 * torch.randn_like(h)            # ~1e-4 relative — well inside the 0.99 threshold
+    r = ch.compare(h, drift)
+    assert r["passed"] and r["cosine"] > 0.99 and r["rel_norm"] < 0.05
+
+
+def test_compare_garbage_fails():
+    """A lazy node returning independent garbage -> cosine ~0 -> caught."""
+    torch.manual_seed(0)
+    h = torch.randn(1, 16, 128)
+    garbage = torch.randn(1, 16, 128)
+    r = ch.compare(h, garbage)
+    assert not r["passed"] and r["cosine"] < 0.5
+
+
+def test_compare_scaled_output_fails_on_rel_norm():
+    """Same DIRECTION but wrong magnitude (a node that scales/half-runs the block): cosine ~1 but the
+    relative-norm guard still fails it."""
+    h = torch.randn(1, 8, 64)
+    r = ch.compare(h, 2.0 * h)
+    assert r["cosine"] > 0.9999 and r["rel_norm"] > 0.4 and not r["passed"]
+
+
+def test_compare_partial_direction_fails():
+    """A ~45-degree output (cosine ~0.7) is well below threshold -> fail."""
+    v = torch.randn(4096)
+    ortho = torch.randn(4096)
+    ortho = ortho - (ortho @ v) / (v @ v) * v         # make it orthogonal to v
+    mixed = v / v.norm() + ortho / ortho.norm()       # ~45 degrees from v (cosine ~0.707)
+    r = ch.compare(v, mixed)
+    assert 0.6 < r["cosine"] < 0.8 and not r["passed"]
+
+
+def test_compare_works_on_sketches():
+    h = torch.randn(1, 16, 128)
+    s = ch.sketch_seed()                              # the verifier's committed per-challenge seed
+    assert ch.compare(ch.sketch(h, seed=s), ch.sketch(h.clone(), seed=s))["passed"]
+    assert not ch.compare(ch.sketch(h, seed=s), ch.sketch(torch.randn(1, 16, 128), seed=s))["passed"]
+
+
+# ---- 4. challenge_block: honest recompute passes, a skipped/wrong block fails ----------------------
+
+def _fake_blocks(monkeypatch):
+    """Stub block_forward so challenge_block runs on CPU with synthetic 'blocks' (callables applying a
+    transform to x) — no model weights. Returns nothing; the transforms are passed as `parts`."""
+    monkeypatch.setattr(ch, "block_forward", lambda parts, x, start=0: parts(x))
+
+
+def _linear(seed, hidden):
+    g = torch.Generator().manual_seed(seed)
+    w = torch.randn(hidden, hidden, generator=g).to(torch.bfloat16)   # match derive_challenge's bf16 input
+    return lambda x: x @ w
+
+
+def test_challenge_block_honest_passes(monkeypatch):
+    _fake_blocks(monkeypatch)
+    block = _linear(1, 32)                             # suspect and trusted run the SAME real block
+    r = ch.challenge_block(block, block, "seed-x", 6, 32, device="cpu")
+    assert r["passed"] and r["cosine"] > 0.9999
+
+
+def test_challenge_block_lazy_constant_fails(monkeypatch):
+    _fake_blocks(monkeypatch)
+    trusted = _linear(1, 32)
+    lazy = lambda x: torch.ones_like(x)               # node skips the matmuls, returns a cheap constant
+    r = ch.challenge_block(lazy, trusted, "seed-x", 6, 32, device="cpu")
+    assert not r["passed"]
+
+
+def test_challenge_block_wrong_block_fails(monkeypatch):
+    _fake_blocks(monkeypatch)
+    trusted = _linear(1, 32)
+    wrong = _linear(2, 32)                             # node ran a DIFFERENT block's weights
+    r = ch.challenge_block(wrong, trusted, "seed-x", 6, 32, device="cpu")
+    assert not r["passed"]
+
+
+def test_challenge_block_uses_same_seeded_input_both_sides(monkeypatch):
+    """Both sides must be fed the identical seeded input (only the transform is under test)."""
+    seen = []
+    monkeypatch.setattr(ch, "block_forward", lambda parts, x, start=0: seen.append(x.clone()) or parts(x))
+    block = _linear(1, 32)
+    ch.challenge_block(block, block, "seed-x", 6, 32, device="cpu")
+    assert len(seen) == 2 and torch.equal(seen[0], seen[1])
+
+
+# ---- 5. commit-first projection (M12): a fixed public seed is forgeable ------------------------------
+
+def _legacy_idx(numel, dim=256):
+    """Recompute the coordinates the OLD fixed-seed (1234567) projection samples — public forever."""
+    g = torch.Generator()
+    g.manual_seed(1234567)
+    return torch.randint(0, numel, (dim,), generator=g)
+
+
+def _forge(h):
+    """The M12 forgery: garbage everywhere EXCEPT the legacy-sampled coords, rescaled so the
+    total L2 norm matches (defeats the rel_norm guard). Full cosine ~0 — a 99%-wrong tensor."""
+    keep = torch.zeros(h.numel(), dtype=torch.bool)
+    keep[_legacy_idx(h.numel())] = True
+    forged = torch.randn(h.numel())
+    forged[keep] = h[keep]
+    forged[~keep] *= float(h[~keep].norm()) / float(forged[~keep].norm())
+    return forged
+
+
+def test_fixed_seed_forgery_fails_under_committed_seed():
+    torch.manual_seed(3)
+    h = torch.randn(10_000)
+    forged = _forge(h)
+    assert not ch.compare(h, forged)["passed"]        # the full tensors really are garbage-far apart
+    # legacy fixed projection: the forgery PASSES — this is the hole, kept only as an explicit opt-in
+    legacy = ch.compare_sketches(ch.sketch(h, seed=ch.LEGACY_SEED), ch.sketch(forged, seed=ch.LEGACY_SEED))
+    assert legacy["passed"], "legacy path changed; update the forgery to match"
+    # committed unpredictable seed: the SAME forgery FAILS (coords unknown at forge time)
+    s = "committed-chal-7"                            # any seed the prover didn't know when forging
+    r = ch.compare_sketches(ch.sketch(h, seed=s), ch.sketch(forged, seed=s))
+    assert not r["passed"] and r["cosine"] < 0.5
+
+
+def test_default_sketch_seed_is_unpredictable_and_recorded():
+    h = torch.randn(1, 8, 64)
+    s1, s2 = ch.sketch(h), ch.sketch(h)
+    assert s1["seed"] != s2["seed"]                   # fresh per-challenge draw, never the fixed literal
+    assert not ch.compare_sketches(s1, s2)["passed"]  # mismatched seeds fail closed
+    # the node sketching with the verifier's seed lines up
+    assert ch.compare_sketches(s1, ch.sketch(h, seed=s1["seed"]))["passed"]
+
+
+def test_seed_commitment_binds():
+    s = ch.sketch_seed()
+    assert ch.seed_commitment(s) == ch.seed_commitment(s) and len(ch.seed_commitment(s)) == 64
+    assert ch.seed_commitment(s) != ch.seed_commitment(ch.sketch_seed())
+
+
+def test_full_sketch_ships_whole_activation():
+    h = torch.randn(1, 4, 8)
+    f = ch.sketch(h, full=True)
+    assert f["n"] == len(f["proj"]) == 32 and f.get("full") is True
+    assert ch.compare_sketches(f, ch.sketch(h.clone(), full=True))["passed"]
+    assert not ch.compare_sketches(f, ch.sketch(torch.randn(1, 4, 8), full=True))["passed"]
+
+
+# ---- 6. the projection index is DEVICE-INDEPENDENT (the cross-device false-FAIL regression) ---------
+
+def test_sketch_indices_come_from_the_cpu_generator():
+    """The sampled coordinates must derive from the CPU generator REGARDLESS of the tensor's
+    device: CUDA (Philox) and CPU (MT19937) draw different sequences for the same manual_seed,
+    so a device-conditional generator makes a GPU suspect vs a CPU verifier compare 256
+    UNRELATED coordinates of identical tensors — a guaranteed false FAIL of every honest node
+    (a CPU box granted recompute is a real verifier role). This pins sketch() to the CPU
+    reference sequence; a reintroduced device-conditional draw breaks it on any CUDA box, and
+    on CPU boxes it still pins the exact expected index stream."""
+    h = torch.randn(1, 8, 96)
+    seed = ch.sketch_seed()
+    sk = ch.sketch(h, seed=seed)
+    g = torch.Generator()                              # the reference: plain CPU generator
+    g.manual_seed(ch._proj_seed(seed))
+    hf = h.detach().to(torch.float32).flatten()
+    idx = torch.randint(0, hf.numel(), (min(256, hf.numel()),), generator=g)
+    assert sk["proj"] == hf[idx].tolist()
+
+
+def test_sketch_matches_across_simulated_hosts():
+    """Two sketches of byte-identical tensors made in separate passes (fresh generators each
+    time — the cross-host shape) must sample the SAME coordinates and pass compare."""
+    seed = ch.sketch_seed()
+    x = ch.derive_challenge(seed, 4, 32, device="cpu", dtype=torch.float32)
+    a, b = ch.sketch(x, seed=seed), ch.sketch(x.clone(), seed=seed)
+    assert a["proj"] == b["proj"]
+    assert ch.compare_sketches(a, b)["passed"]

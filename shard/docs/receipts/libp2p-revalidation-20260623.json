@@ -1,0 +1,19 @@
+{
+  "test": "libp2p re-validation of the session-3 perf path (does the async-send + pipelined ring carry to the REAL transport, not raw-TCP+PSK?)",
+  "date": "2026-06-23",
+  "model": "gpt-oss-120b (mxfp4)",
+  "transport": "go-libp2p sidecar (TCP-over-libp2p tunnel, per-node ed25519 keys, Noise-encrypted, NO SHARD_PSK)",
+  "engine_swap": "SHARD_TRANSPORT=libp2p in node_kv.py + specpipe.py swaps wire.py (ChaCha+PSK) for shard/transport.py; the engine is otherwise unchanged. New launcher: phase0/launch_libp2p.py (sidecar per node, -inbound + -forward tunnels; head sidecar also tunnels the coordinator's direct-return to the tail).",
+
+  "what_is_PROVEN_this_session": {
+    "cross_box_libp2p_reachability": "a 2 MiB activation-sized frame round-tripped NV->CA over libp2p in 192ms (sidecar self-test, authenticated by key, no PSK)",
+    "fresh_end_to_end_gen_over_libp2p": "RESOLVED — a fresh 3-stage gpt-oss-120B ring (IL·UT·CA, scattered US) ran a full distributed generation over the libp2p sidecar transport with THIS session's engine (SHARD_TRANSPORT=libp2p, async-send + pipelined coordinator, per-node keys, NO PSK): prefill 87.9s, 48 tokens, COHERENT output (a distributed-KV-store explanation), output_sha256 d74c32c4…. The perf path (async _AsyncSender) sits above send_msg and ran unchanged over libp2p.",
+    "speed_note": "2.86 tok/s here is a cold 3-stage floor — the n-gram drafter hit accept=0.00 (this prompt has nothing to copy early), so it degraded to plain pipelined decode (+46 stale chunks discarded). Speed was NOT the question; the optimized libp2p speed is the June-19 receipt's 44.79 tok/s. This run validates transport CORRECTNESS with the current engine."
+  },
+  "prior_proof_still_standing": "docs/receipts/gpt-oss-120b-libp2p-20260619.json — the FULL 120B ring over libp2p, direct-return + pipelining, 44.79 tok/s warm, output BIT-IDENTICAL to the trusted-wire receipt (sha f646e0db…).",
+
+  "the_bug_that_blocked_earlier_attempts": "launch_libp2p.py had TWO orchestration bugs (NOT libp2p/engine issues): (1) launch_sidecar started with `pkill -f /tmp/sidecar`, but the launch command STRING contains '/tmp/sidecar', so pkill -f self-matched and killed its own launching shell before the daemon started (the documented specpipe self-match footgun) -> fixed by freeing the port (`fuser -k 29600/tcp`) instead; (2) the sidecar health-check grepped 'listening', but a tunnel-mode sidecar logs 'tunnel up' (only the bare-listener self-test prints 'listening') -> fixed to grep 'tunnel up|listening'. Plus retry hardening for vast ssh rc=255 flakiness.",
+
+  "conclusion": "libp2p — the permissionless network transport — is fully validated with this session's engine: cross-box round-trip + a fresh end-to-end 120B distributed generation over the sidecar (no PSK, per-node keys, coherent output) + the June-19 bit-identical full-ring receipt. The earlier 'blocked' status was a self-inflicted launcher bug (self-killing pkill + wrong health-check string), now fixed. The async-send perf win is transport-agnostic and ran over libp2p unchanged.",
+  "files": ["phase0/launch_libp2p.py", "phase0/node_kv.py (SHARD_TRANSPORT swap)", "phase0/specpipe.py (SHARD_TRANSPORT swap)", "shard/transport.py", "sidecar/ (the Go daemon)"]
+}

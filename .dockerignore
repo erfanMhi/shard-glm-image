@@ -1,0 +1,8 @@
+.git
+**/.git
+**/__pycache__
+**/*.pyc
+.github
+README.md
+NOTES.md
+scripts/launch_ring.py

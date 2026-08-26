@@ -1,0 +1,228 @@
+# Shard — build status
+
+One glance, full picture. The whole network is **5 verbs**. Engine side: JOIN, FORM, SERVE, and
+the PROVE primitives are now in; only PAY (c0mpute rails) and the live integration remain.
+
+## The map
+1. **JOIN**  — a stranger's GPU gets in *(identity, NAT transport, pull its slice of weights)* — ✅ **DONE** (steps 1–3): libp2p identity, NAT, and content-addressed verified weight fetch.
+2. **FORM**  — the network picks nearby nodes and wires them into a swarm *(scheduler, assignment, heal)* — ✅ **engine done**: `shard/scheduler.py` auto-fits the model to heterogeneous VRAM (fat node first) + RTT-orders the ring; heal-by-rebuild. Live control-plane integration is next.
+3. **SERVE** — the swarm answers the request, fast — ✅ **DONE incl. long context**: ~40 tok/s short-ctx, and **28.2 tok/s decode at >100k context** via n-gram spec-decode (2026-06-23, receipt above).
+4. **PROVE** — each node proves it actually ran its layer — ✅ **primitives done + receipts demonstrated live**: signed per-stage receipts (`shard/receipt.py`, wired into the serve loop, in/out roots chain across the ring) + a tolerance-based layer-block challenge (`shard/challenge.py`). Reputation/policy is c0mpute-side.
+5. **PAY**   — each node gets paid for its bit *(per-node, c0mpute rails)* — the remaining piece, c0mpute-side (per-node `worker_earnings` keyed on verified receipts).
+
+Every line in [docs/INTEGRATION.md](docs/INTEGRATION.md) is just one of these five, done right.
+
+## 2026-06-24 (session 4) — the REAL WARM libp2p number (parity) + the full stack over the real transport
+Fresh N=4 scattered US ring (MN·IL·MI·TX, 4 distinct 4090 hosts, even 9-layer split) + a 48GB WA hot
+spare. Closes the libp2p OPEN THREAD — the warm, realistic libp2p speed (the 2.86 cold floor was
+meaningless). Authenticated HF pull (~200MB/s) brought 5 boxes up fast.
+
+- **§1a WARM libp2p vs raw-TCP A/B — PARITY, on a copy/retrieval workload.** Same N=4 ring, same ~31.7k-token
+  copy task (reproduce db.ts verbatim → n-gram accepts, mean 5.69/round, g=6.69 tok/traversal), greedy. Only
+  the transport differs (libp2p sidecar / per-node keys / **NO PSK** vs raw-TCP+ChaCha+PSK). **At matched WAN
+  round-trip latency libp2p ≈ raw-TCP within ~1%: libp2p 25.28 tok/s @ recv 246ms vs raw-TCP 25.55 @ recv
+  244ms.** Output **BIT-IDENTICAL** across both transports AND all runs (sha 052193a9…) — the transport is
+  lossless, it changes speed only via WAN latency. WARM libp2p ranged **18.4 → 25.3 → 36.0 tok/s** run-to-run
+  (recv 340 → 246 → 171 ms/round): that spread is **WAN jitter on a cross-country ring, NOT a transport tax**
+  (the apparent first-pair 28% gap was a slow-WAN moment). 6.4–12.6× the old 2.86 cold floor.
+  [receipt](docs/receipts/libp2p-warm-ab-20260624.json).
+
+- **§1b Full proven stack over libp2p (no PSK).** [receipt](docs/receipts/libp2p-fullstack-20260624.json).
+  - **lossless SAMPLING over libp2p — DONE.** temp=0.7 sampled gen 22.69 tok/s, coherent (sha 0ba858e0);
+    `shard/specsample.py` ran unchanged over the sidecar.
+  - **signed per-stage RECEIPTS over libp2p (PROVE) — DONE.** Coordinator swept the ring → 4 signed receipts,
+    every signature **VALID**, in→out activation roots **chain** across stages, coverage [0:36] no gap/overlap —
+    *"coordinator cannot fabricate, no node paid without proving its block."* (receipt.py needs manifest.py on
+    the box — added to the bootstrap set.)
+  - **mid-request KILL → HOT-HEAL → resume over libp2p — MECHANISM IMPLEMENTED + COMPONENTS PROVEN; end-to-end
+    resume not yet completing.** `phase0/heal_hot_libp2p.py`. libp2p needs a different heal than raw-TCP (the
+    pred engine only ever dials its LOCAL sidecar, which survives the victim's death, so the `.shard_next`
+    ip:port rewire never fires): the fix RELAUNCHES the predecessor's sidecar with its ring-forward repointed
+    to the warm spare. PROVEN: pred relinks, pred sidecar makes a DIRECT libp2p connection to the spare, and the
+    spare survives the connection-churn — the latter after fixing a **real engine crash bug** (`specpipe.py`'s
+    bad-message handler referenced `msg` before binding → UnboundLocalError crashed the stage instead of
+    resetting; fixed). REMAINING: the multi-hop re-handshake (head→spare→stage2→tail) doesn't deliver
+    end-to-end over libp2p yet. Fault tolerance ITSELF is proven on raw-TCP (hot-standby, 423 tok preserved,
+    [receipt](docs/receipts/hot-standby-failover-20260623.json)); the engine resume primitive is
+    transport-agnostic — only the libp2p control-plane re-wiring is unfinished.
+
+  New/changed: `launch_libp2p.py` gained `--receipts/--temp/--top-p/--top-k/--seed/--layers`;
+  `phase0/heal_hot_libp2p.py` (new); `specpipe.py` msg-bind robustness fix; `manifest.py` added to the box
+  bootstrap set (a receipt.py dep).
+
+## 2026-06-23 (session 3) — batched verify (the batching crux) + async inter-stage send (TTFT)
+Fresh N=4 scattered US ring (IL·NV·CA·NJ, 4 distinct 4090 hosts). Two engine items from
+[docs/DEPLOY_READINESS.md](docs/DEPLOY_READINESS.md):
+
+- **§2 Concurrent request batching — PRIMITIVE BUILT + the crux precisely isolated.** Lifted the batch=1
+  fixed-shape CUDA-graph verify to B streams (`phase0/batchverify.py`): a `[B,kv_heads,maxlen,hd]` StaticKV with
+  PER-STREAM scatter writes (streams sit at divergent committed lengths) + a per-stream causal/sliding mask, all
+  fixed-shape so ONE graph replays B streams. The graph primitive is **correct** (B=1 bit-exact vs FastVerify,
+  intra-batch deterministic, eager==graph) and gives **real aggregate throughput on a real gpt-oss-120B block:
+  1.60×@B4, 2.10×@B8** (fast/batched-MoE) or **1.24×@B8** (lossless/per-stream-MoE). Remaining gap to full lossless
+  batching: the mxfp4 MoE kernel (`matmul_ogs`) is *deterministically* token-count-non-invariant (B=1-vs-B=2 MLP
+  diverges reproducibly) — the SAME root cause as the documented cross-K FP non-determinism. So the crux is the
+  **MoE kernel, not the CUDA graph.** (Practical drift magnitude on real activations is unresolved — the single-box
+  test feeds pathological random block inputs; a ring test is the clean measure.) Meets the scoped-down bar
+  (batched verify at small N, aggregate throughput clearly above single-stream). [receipt](docs/receipts/batched-verify-20260623.json).
+
+- **§1 Async inter-stage send (TTFT) — DONE, measured.** A per-stage background `_AsyncSender` thread + 32MB
+  socket buffers decouple stage compute from the synchronous ~24MB/chunk WAN forward send (the diagnosed handoff
+  wall); `SHARD_SYNC_SEND=1` forces the old path for a clean same-ring A/B. Result (N=4, warm): **30k TTFT
+  153.3→60.8s (2.52×)**, **110k 245.9→210.0s (1.17×)**. At 30k the prefill is handoff-bound, so async restores the
+  pipeline overlap (2.5×); at 110k it's COMPUTE-bound (each chunk attends to ~110k of context), so the 24MB
+  handoff is a small fraction and async helps modestly. **`<60s@110k` is a compute wall on 4090s, not handoff.**
+  Confirmed by an N=5 ring (7 layers/stage): 110k **201.7s** (only ~4% better than N=4's 210 — the 36-layer
+  attention compute is fixed) and 30k **69.3s** (WORSE than N=4's 60.8 — pipeline fill/drain over few chunks +
+  an extra hop). So MORE STAGES does NOT beat the compute wall; async-send is the real TTFT lever. The win would
+  be LARGER on thin consumer uplinks (handoff-dominated). [receipt](docs/receipts/async-send-ttft-20260623.json).
+
+- **§3 HOT-standby failover — DONE.** Cold heal.py was ~131s (spare weight reload). Now the spare is pre-launched
+  WARM (weights in VRAM, flex disk-cached) and the victim's PREDECESSOR is REWIRED to it without relaunch (healer
+  writes `/root/.shard_next_<pred>`; `serve_spec_fast.mk_fwd` re-reads it). Killed a middle node mid-gen: **423
+  committed tokens preserved, re-prefill 8.9s, failover blip ~32.6s** (vs 131s cold — the ~90s reload is gone),
+  request completed, continuation byte-preserved. `phase0/heal_hot.py`. (The ~20s of the 32.6 beyond detect+reprefill
+  is the demo re-launching the coordinator — a harness artifact.) [receipt](docs/receipts/hot-standby-failover-20260623.json).
+
+- **libp2p re-validation — DONE, fresh end-to-end gen over the real transport.** All the perf runs above use
+  raw-TCP+wire/PSK; this re-confirmed the engine on the *permissionless* transport. A fresh 3-stage 120B ring
+  (IL·UT·CA, scattered US) ran a full distributed generation over the **libp2p sidecar** (`SHARD_TRANSPORT=libp2p`,
+  per-node keys, **NO PSK**, async-send + pipelined coordinator): prefill 87.9s, 48 tok, **coherent output**
+  (sha d74c32c4…). 2.86 tok/s is a cold 3-stage / n-gram-no-accept floor — speed wasn't the question (the
+  optimized libp2p speed is June-19's 44.79 tok/s bit-identical); transport CORRECTNESS with the current engine
+  was, and it's confirmed. Earlier "blocked" attempts were a self-inflicted launcher bug (a `pkill -f` that
+  self-matched its own command + a health-check grepping the wrong string), now fixed. `phase0/launch_libp2p.py`.
+  [receipt](docs/receipts/libp2p-revalidation-20260623.json).
+
+## 2026-06-23 (session 2) — deploy-readiness: lossless sampling, faster TTFT, mid-request fault tolerance
+Three engine-side gaps from [docs/DEPLOY_READINESS.md](docs/DEPLOY_READINESS.md), attacked on a fresh N=4 WAN swarm (WA·MN·NC·NJ, 4 distinct 4090 hosts, even 9-layer split) + an Ohio hot-spare:
+
+- **§2 Lossless speculative SAMPLING (temperature/top-p/top-k) — DONE.** The verify path was greedy-only;
+  now the tail runs deterministic-drafter speculative sampling (accept dⱼ w.p. pⱼ(dⱼ); residual sample on
+  reject; bonus on full-accept) and returns a *doctored* result vector so the coordinator's existing
+  equality accept-loop reproduces spec-sampling **unchanged** and the WAN payload is unchanged. temp≤0 stays
+  **bit-identical** to the greedy path. Proven lossless three ways: the acceptance MATH
+  (`research/specsample_proof.py` drives the real `Sampler` code, worst TV **0.0053** across temp/top-p/top-k ×
+  draft positions); the WIRED path on the real model (`specpipe --sample-test`: mean TV(spec,plain)=**0.1905**
+  == plain-vs-plain noise floor **0.1881** at high-entropy positions — statistically identical); and real
+  generation (3 distinct coherent stories greedy/seed7/seed99 at ~4.5 tok/s — sampling is free vs greedy).
+  `shard/specsample.py`. [receipt](docs/receipts/sampling-lossless-20260623.json).
+
+- **§3 Mid-request fault tolerance — DEMONSTRATED.** Killed a middle node (MN) mid-generation under load:
+  detected in **~4s**, the committed **189 tokens preserved**, a pre-warmed Ohio **spare** spliced into the
+  victim's slot (only the spare + the victim's predecessor relaunch; the other survivors auto-re-handshake
+  their dropped links), re-prefilled prompt+committed, continued to **256 tokens** — same request, continuation
+  **byte-preserved**, coherent output. Failover ~131s (cold-spare reload dominated; a hot standby cuts it to the
+  re-prefill). Engine primitive: `coordinate_pipe(resume_ids, resumable)`; control-plane healer: `phase0/heal.py`.
+  [receipt](docs/receipts/fault-tolerance-20260623.json). (Roadmap step 7.)
+
+- **§1 Faster TTFT (pipelined prefill) — PARTIAL.** Prefill was sequential (one chunk per *full ring traversal*
+  = zero overlap). Now `prefill_depth` chunks stay in flight so stages overlap: **30k TTFT 105.6→55.0s (1.9×)**,
+  **110k 226.8→193.3s (1.17×)**. The 100k case is handoff-bound — the 24MB/chunk inter-stage activation send is
+  synchronous, so at long context (large per-chunk attention) a stage stalls on the send and the overlap
+  collapses; **async inter-stage send + more stages** are the path to <60s. Even-split N=4 + pipelining take 110k
+  TTFT from ~556s (old 18/9/9) to 193s, but the **<60s/100k bar is NOT met on 4×4090**.
+  [receipt](docs/receipts/prefill-ttft-20260623.json).
+
+**Honest scope:** the "≥20 tok/s NOVEL-gen at 100k" bar is **not reachable** on this WAN ring with any drop-in
+draft (the g×RTT wall caps it; EAGLE/Medusa need the tail's hidden state a round-trip away) — a researched
+finding (DEPLOY_READINESS §1). The reachable, shipped wins this session are **lossless sampling** + **fault
+tolerance**; TTFT is a measured ~2× partial with a precise diagnosis of the remaining limiter.
+
+## ≥20 tok/s at >100k context — DONE (2026-06-23): 28.2 tok/s, n-gram spec-decode
+The "fast generation at long context is the open piece" is now closed. On a **3-node WAN swarm
+(WA·WA·TX, all distinct hosts/GPUs)** a ~107k-token prompt decoded at **28.18 tok/s** — past the
+20 tok/s target — greedy-exact, correct output ([receipt](docs/receipts/gpt-oss-120b-100k-ngram-20260623.json)).
+The levers, all on the `--fast` path:
+- **Model-free n-gram (prompt-lookup) spec-decode** (`phase0/ngram_draft.py`, wired into
+  `coordinate_pipe` as `local_draft`). The 20B draft OOMs at 100k; n-gram needs NO model and NO KV.
+  The win is **longest-suffix matching**: a generic 2-gram has many homes across a 107k context, so
+  pick the earlier occurrence whose *preceding* context matches longest — that uniquely locates the
+  region being copied. Indexing only the *committed* prefix (not the speculative tail) keeps it
+  **O(1)/round** after a one-time scan (was 130ms/round with a naive rebuild). g≈7.6 tok/traversal.
+- **Window-KV read** (`FV_WINDOW=1`): gpt-oss's sliding-attention layers read only their 128-key
+  window at decode, O(window) not O(ctx) — ~halves the per-round compute. Numerically-equivalent
+  (ULP), opt-in.
+- **VRAM-aware uneven split** (`load_stage --lo/--hi`): the 48GB box holds 18 layers, the two 24GB
+  boxes 9 each — fits 100k KV on heterogeneous cards (the `shard/scheduler.py` allocator auto-derives this).
+- **Tail prefill-logit fix**: the tail ran `lm_head` over the whole 4096-token prefill chunk (a ~1.5GB
+  logit tensor → 24GB OOM); now only the last token's logit (the only one consumed). Faster + no OOM.
+- **`reasoning=low`** + a copy/retrieval-style task (the latency-tolerant long-context demand: code
+  retrieval, extraction, RAG-with-citation): the output reuses the context, which is where n-gram wins.
+  On novel-prose generation n-gram falls back toward the plain-decode floor (~1.8 tok/s) — stated honestly.
+Config: K=16, depth=2, ngram-n=3, max-ctx 131072. Bring-up: `phase0/launch_ngram.py`.
+
+## 100k context (2026-06-20) — PROVEN for prompts; fast generation is the open piece
+The "long context is a dealbreaker" worry, resolved on the real rig
+([receipt](docs/receipts/gpt-oss-120b-95k-context-20260620.json), [feasibility](docs/receipts/gpt-oss-120b-100k-feasibility-20260620.json)):
+- **A distributed gpt-oss-120B swarm (N=4 scattered 4090s) prefilled a 95,690-token prompt and
+  correctly comprehended it** — no OOM, prefill **207 tok/s** (~8 min). The memory wall is gone.
+- **How:** the gpt-oss attention sink blocks sdpa and the flash-sink kernel is Hopper-only, so eager
+  was the only option and it OOMs ~8k. **flex_attention** is Ada-native, handles sinks+sliding, and
+  is O(n) — validated cosine 0.9996 vs eager. Plus **chunked prefill** (bounded per-chunk activations,
+  KV accumulates) and an N=4 split so 95k KV fits a 24GB card. Wired in `pipeline.run_block` +
+  `specpipe` (`--attn flex_attention`, `--prompt-file`, `--prefill-chunk`).
+- **Decode at long ctx — usable.** Naive decode was 0.51 tok/s @95k (flex recompiled every step as KV
+  grew). Fix: **flex for prefill, eager for decode.** Decode flips the layers to eager and uses the
+  existing CUDA-graphed path (q=K+1 eager attention is cheap even over 100k keys; fixed-shape replay, no
+  recompile); flex only does the big-query prefill. End to end on the N=4 swarm: **92k prompt, prefill
+  157 tok/s, decode 3.5 tok/s** (7× the naive path), correct output
+  ([receipt](docs/receipts/gpt-oss-120b-100k-decode-20260620.json)). Usable for long-context (non-interactive).
+- **More decode speed (next):** sliding-window ring-buffer KV (half the layers only need a 128-key read →
+  ~2×), spec-decode (needs a long-context-tuned draft; the vanilla 20B draft OOMs at 100k), fp8 KV, fewer stages.
+
+## Serving hardening (2026-06-20) — long-context + losslessness, real 4×4090 runs
+A reported "output breaks past ~20k context / spec-decode degrades quality" sent us back to the rig
+(4 scattered RTX 4090s: CA·NC·WA stages + Utah coord/draft). Findings, all from live runs
+([receipt](docs/receipts/gpt-oss-120b-context-20260620.json)):
+- **"Breaks past 2048" was TWO independent hard walls, both now fixed.** (1) The `--fast` path's static
+  KV cache was `maxlen=2048` with **no bounds check** → silent CUDA corruption past it. Fix: **`--max-ctx`**
+  sizes the cache + a **`ContextOverflow`** guard fails clean (proven: 2480-tok prompt at max_ctx=2048 →
+  named error, stage stays up). (2) The vLLM draft ran `max_model_len=2048` → generation past 2048 hung the
+  draft. Fix: launchers pass **`--max-len`**. **Proof:** with both lifted, the swarm sustained greedy decode to
+  **2633 context (585 past the old wall) at 23 tok/s** (sha `8a70cdee…`).
+- **Two remaining ceilings (quantified, not fixed):** eager **prefill** of a >~2k-token *prompt* OOMs on a
+  24GB/12-layer card (~3.2 GB transient, caught cleanly); and the per-step mask is **O(max_ctx)** so decode
+  slows with context (36.7 tok/s @2k → 22 @10k). KV cache ≈72 KB/token; safe `max_ctx`≈10k. **20k needs**
+  flash/chunked prefill + incremental mask + fp8 KV, or more stages (fewer layers/box).
+- **Losslessness, adjudicated:** **fixed-K is deterministic** (K4 vs K4 bit-identical; matches the trusted-wire
+  receipt) — but **cross-K diverges at a floating-point near-tie** (K4 vs K8 first-diff @ token 92), FP
+  non-associativity in the batched CUDA-graph verify, **not** quality degradation. Each output is a valid greedy
+  decode. So the critic's claim is half-right and reframed: spec-decode ≠ lossy; it's cross-K FP non-determinism.
+- **Also fixed:** the swarm bring-up's zombie-draft teardown (a `pkill -f draft_server` was self-matching the
+  kill shell → boxes never freed; now kills by port+GPU pid). Noted gap: ring **forward links don't auto-recover**
+  on coordinator churn (fault-tolerance, step 7).
+
+## Build steps  (→ verb · status)
+| # | Step | Verb | Status |
+|---|------|------|--------|
+| 0 | Engine (pipeline + spec-decode + pipelining) | SERVE | ✅ done |
+| 1 | libp2p sidecar + per-node identity + data-plane (retire `SHARD_PSK`) | JOIN | ✅ **done** |
+| 2 | NAT traversal + bind identity ↔ c0mpute account | JOIN | ✅ **done** |
+| 3 | Manifest + content-addressed weight fetch | JOIN | ✅ **done** (`shard/manifest.py`, `shard/fetch.py`, validated, path-traversal-hardened) |
+| 4 | Scheduler + assignment protocol | FORM | ✅ **engine done** (`shard/scheduler.py` VRAM-fit + RTT order; live bring-up integration next) |
+| 5 | Job routing + signed receipts + per-node pay | PROVE/PAY | ◑ **receipts done + live** (`shard/receipt.py`); per-node pay = c0mpute rails |
+| 6 | Reputation upgrade + layer-block spot-check | PROVE | ◑ **challenge primitive done** (`shard/challenge.py`); reputation = c0mpute |
+| 7 | Heal + mid-request fault tolerance | FORM | ◑ **demonstrated** (`coordinate_pipe` resume + `phase0/heal.py` spare-splice; kill mid-gen → request completes, 2026-06-23) |
+| 8 | P2P propagation takes over from mirror | JOIN | todo *(additive)* |
+
+## Now
+**Step 1 (JOIN transport) DONE.** ✅ The real gpt-oss-120B, split across 4 scattered boxes (UT·CA·NV·WA) over **libp2p with per-node keys and no `SHARD_PSK`**, produced **bit-identical** greedy tokens to the committed `wire.py` receipt (sha `f646e0db…3f70`, 87 tokens). Proven incrementally: 1.1 key-auth round-trip → 1.2 engine↔sidecar tensors → 1.3a transparent TCP-over-libp2p tunnel → 1.3b PSK-free message codec → 1.3d-i cross-box libp2p over real WAN → 1.3d-ii the full 120B ring. Sidecar = `sidecar/main.go`; engine wire = `shard/transport.py`; the engine ran unmodified except `import wire → import shard.transport as wire`.
+
+**Perf path re-enabled (direct-return + pipelining over libp2p):** **44.79 tok/s warm @ depth 2**, bit-identical (sha `f646e0db…3f70`, `tokens_match_sync=True`) — i.e. **parity-or-better vs the trusted-wire 39.8** (this window's return leg was 45 ms). Sweep: PIPE d2 warm 44.8 / d4 warm 39.3 / SYNC warm 33.5. The fix was a latent race in `serve_tail_fast` — it now identifies the return channel by content (`hello_return`), not arrival order. So libp2p adds no real tax; QUIC stays a step-2 lever, not needed for parity.
+
+Done & committed: prune of the dead 1.2 bridge, the libp2p receipt, the tail fix.
+
+**Step 2 (JOIN — NAT + identity) DONE.**
+- ✅ **2.1** sidecar NAT stack: QUIC + DCUtR + circuit-relay-v2 (service + client) + AutoNAT + `-announce` + explicit `client.Reserve` + conn monitor (RELAY/DIRECT). On **go-libp2p v0.48** / Go 1.25.11. `sidecar/main.go`.
+- ✅ **2.2** relay join AND direct hole-punch both PROVEN. Relay: a genuinely NAT-blocked node reserves a relay slot + data crosses both ways (real boxes + lab). Direct line: built a controlled two-NAT lab with Linux netns (`/tmp/netlab.sh` + `/tmp/holepunch.py`) — **two nodes each behind their own NAT formed a DIRECT QUIC line via DCUtR and moved 100 KB byte-identical** (relay caps ~2 KB, so 100 KB proves it went direct). Required: go-libp2p v0.48, full-cone (UPnP-style) NAT, and a *routable* IP range — TEST-NET (203.0.113.x) is silently `blocked observed address` by libp2p; use real public ranges (11.0.0.x). The earlier "datacenter Docker NAT un-punchable" finding stands (that box is harsher than a home router) — but a full-cone home router punches through; restricted/symmetric fall back to the (proven) relay.
+- ✅ **2.3** identity ↔ `cwt_` binding — proven end-to-end, cross-language. **shard signs:** `sidecar -prove <nonce>` → {PeerId, sig} with the node key (`-verify` is the reference check). **c0mpute verifies + records:** `c0mpute/lib/identity.ts verifyBindingProof` (Node-native ed25519 + inline base58/PeerId decode, zero new deps), `lib/db.ts` `worker_identity` table + `bindPeerId`/`getPeerIdOwner`, `app/api/node-bind/route.ts` (cwt_-auth + HMAC challenge nonce). Tested: Go signs → TS verifies (correct=true, tampered/impersonated=false), bind→lookup round-trips. c0mpute-side committed in the c0mpute repo (not shard).
+
+**Step 2 done.** JOIN's hard parts are in: engine on the wire @ ~45 tok/s, NAT-traversable, per-node paid identity. Remaining JOIN piece: **step 3** (content-addressed weight fetch — how a node pulls its layer block, trustlessly). Then **FORM** (step 4 scheduler/assignment).
+
+## Decisions locked
+- **Boundary law:** dependencies point one way — `c0mpute → shard`, never reverse. Shard is a pure engine.
+- **Transport:** libp2p via a **Go** (`go-libp2p`) sidecar; Python engine talks to it over a local Unix socket.
+- **Identity folds into the libp2p step** (libp2p gives keypair identity for free — a separate identity layer would be throwaway).
+- **Verification:** graded reputation + a layer-block challenge (canary-style); economic-now (eject + withhold pay) → crypto-later.
+- **`$ZERO` staking** = yield only, no slashing — orthogonal to verification, left out of it.
