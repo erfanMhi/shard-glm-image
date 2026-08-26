@@ -1,0 +1,9 @@
+/root/vmoe/lib/python3.12/site-packages/huggingface_hub/constants.py:298: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+coord(KV) -> stage chain @ 206.41.207.98:20828
+
+GENERATED 96 tokens in 77.8s = 1.23 tok/s (NVFP4 distributed, KV-CACHED)
+decoded: 'def quicksort(arr): \n    if len(arr) <= 1:\n        return arr\n    else:\n        pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)\nprint(quicksort([2,5,1,9,'
+Warning: Permanently added '[216.193.128.133]:42546' (ED25519) to the list of known hosts.
+Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+Have fun!

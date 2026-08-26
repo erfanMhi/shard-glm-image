@@ -1,0 +1,41 @@
+/root/vmoe/lib/python3.12/site-packages/huggingface_hub/constants.py:298: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+INFO 08-26 21:32:16 [parallel_state.py:1568] world_size=1 rank=0 local_rank=0 distributed_init_method=env:// backend=nccl
+INFO 08-26 21:32:16 [scheduler.py:239] Chunked prefill is enabled with max_num_batched_tokens=2048.
+INFO 08-26 21:32:16 [vllm.py:999] Asynchronous scheduling is enabled.
+INFO 08-26 21:32:16 [kernel.py:270] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+[cfg] moe_backend = cutlass
+INFO 08-26 21:32:17 [parallel_state.py:1903] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+WARNING 08-26 21:32:17 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+INFO 08-26 21:32:17 [nvfp4.py:231] Using 'VLLM_CUTLASS' NvFp4 MoE backend out of potential backends: ['FLASHINFER_TRTLLM', 'FLASHINFER_CUTEDSL', 'FLASHINFER_CUTEDSL_BATCHED', 'FLASHINFER_CUTLASS', 'VLLM_CUTLASS', 'MARLIN', 'EMULATION'].
+INFO 08-26 21:32:19 [nvfp4.py:537] Using MoEPrepareAndFinalizeNoDPEPModular
+WARNING 08-26 21:32:19 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:19 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:21 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:21 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:23 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:23 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:25 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:25 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:27 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:27 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:28 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:28 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:30 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:30 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:32 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:32 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:34 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:34 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:35 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:36 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:37 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:37 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:39 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:39 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+WARNING 08-26 21:32:41 [modelopt.py:1022] Detected ModelOpt NVFP4 checkpoint (quant_algo=NVFP4). Please note that the format is experimental and could change in future.
+stage layers [26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38] loaded (75.3 GB) — warming...
+stage layers [26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38] WARM, listening :29600 -> 147.185.60.9:37743
+conn closed
+conn closed
+conn closed

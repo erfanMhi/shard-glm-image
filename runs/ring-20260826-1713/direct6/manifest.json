@@ -1,0 +1,218 @@
+{
+ "args": {
+  "ids": "48819314,48819315,48819317,48819324,48819333,48819336,48819339",
+  "coord_id": 48819324,
+  "mode": "direct6",
+  "prompt": "def quicksort(arr):",
+  "max_new": 96,
+  "runs": 3,
+  "out": "/private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/direct6",
+  "trace": false,
+  "draft_repo": "zai-org/GLM-4-9B-0414",
+  "K": null,
+  "depth": 6,
+  "order": "48819333,48819315,48819339,48819314,48819317,48819336",
+  "remesh": false,
+  "skip_fetch": true,
+  "stage_timeout": 2400,
+  "allow_any_label": false,
+  "auto_coord": false,
+  "mesh_only": false
+ },
+ "K": 6,
+ "started": "2026-08-26T21:35:49Z",
+ "nodes": [
+  {
+   "id": 48819314,
+   "label": "erfan-glm-ring-california",
+   "geolocation": "California, US",
+   "gpu_name": "RTX PRO 6000 S",
+   "public_ipaddr": "147.185.60.9",
+   "cuda_max_good": 13.0,
+   "inet_up": 888.4,
+   "inet_down": 934.6,
+   "dph_total": 1.7222222222222223,
+   "stage_port": 37743
+  },
+  {
+   "id": 48819315,
+   "label": "erfan-glm-ring-texas",
+   "geolocation": "Texas, US",
+   "gpu_name": "RTX PRO 6000 WS",
+   "public_ipaddr": "208.68.65.246",
+   "cuda_max_good": 13.3,
+   "inet_up": 679.7,
+   "inet_down": 704.2,
+   "dph_total": 1.4027777777777777,
+   "stage_port": 7325
+  },
+  {
+   "id": 48819317,
+   "label": "erfan-glm-ring-north_carolina",
+   "geolocation": "North Carolina, US",
+   "gpu_name": "RTX PRO 6000 WS",
+   "public_ipaddr": "136.56.33.107",
+   "cuda_max_good": 13.2,
+   "inet_up": 1387.4,
+   "inet_down": 5457.7,
+   "dph_total": 1.2816666666666667,
+   "stage_port": 24984
+  },
+  {
+   "id": 48819324,
+   "label": "erfan-glm-ring-massachusetts",
+   "geolocation": "Massachusetts, US",
+   "gpu_name": "RTX PRO 6000 WS",
+   "public_ipaddr": "216.193.128.133",
+   "cuda_max_good": 13.2,
+   "inet_up": 752.7,
+   "inet_down": 822.6,
+   "dph_total": 1.6911333333333334,
+   "stage_port": 42561
+  },
+  {
+   "id": 48819333,
+   "label": "erfan-glm-ring-maryland",
+   "geolocation": "Maryland, US",
+   "gpu_name": "RTX PRO 6000 S",
+   "public_ipaddr": "206.41.207.98",
+   "cuda_max_good": 13.1,
+   "inet_up": 5829.3,
+   "inet_down": 7642.2,
+   "dph_total": 1.8477777777777777,
+   "stage_port": 20828
+  },
+  {
+   "id": 48819336,
+   "label": "erfan-glm-ring-new_york",
+   "geolocation": "New York, US",
+   "gpu_name": "RTX PRO 6000 S",
+   "public_ipaddr": "38.82.223.83",
+   "cuda_max_good": 13.0,
+   "inet_up": 820.0,
+   "inet_down": 817.2,
+   "dph_total": 1.4203333333333334,
+   "stage_port": 61848
+  },
+  {
+   "id": 48819339,
+   "label": "erfan-glm-ring-california2",
+   "geolocation": "California, US",
+   "gpu_name": "RTX PRO 6000 WS",
+   "public_ipaddr": "54.151.2.77",
+   "cuda_max_good": 13.2,
+   "inet_up": 837.6,
+   "inet_down": 800.8,
+   "dph_total": 2.708333333333333,
+   "stage_port": 40481
+  }
+ ],
+ "ring": [
+  {
+   "id": 48819333,
+   "geo": "Maryland, US",
+   "layers": [
+    0,
+    12
+   ],
+   "ep": "206.41.207.98:20828"
+  },
+  {
+   "id": 48819315,
+   "geo": "Texas, US",
+   "layers": [
+    13,
+    25
+   ],
+   "ep": "208.68.65.246:7325"
+  },
+  {
+   "id": 48819339,
+   "geo": "California, US",
+   "layers": [
+    26,
+    38
+   ],
+   "ep": "54.151.2.77:40481"
+  },
+  {
+   "id": 48819314,
+   "geo": "California, US",
+   "layers": [
+    39,
+    51
+   ],
+   "ep": "147.185.60.9:37743"
+  },
+  {
+   "id": 48819317,
+   "geo": "North Carolina, US",
+   "layers": [
+    52,
+    64
+   ],
+   "ep": "136.56.33.107:24984"
+  },
+  {
+   "id": 48819336,
+   "geo": "New York, US",
+   "layers": [
+    65,
+    77
+   ],
+   "ep": "38.82.223.83:61848"
+  }
+ ],
+ "loop_cost_ms": null,
+ "coord_id": 48819324,
+ "order_ids": [
+  48819333,
+  48819315,
+  48819339,
+  48819314,
+  48819317,
+  48819336
+ ],
+ "finished": "2026-08-26T21:38:02Z",
+ "results": [
+  {
+   "summary": "GENERATED 98 tokens in 27.2s = 3.61 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal",
+   "tok_s": 3.61,
+   "time_split": "time split: draft 2.5s (9%) | verify 23.4s (86%)",
+   "decoded": "'def quicksort(arr): \\n    if len(arr) <= 1:\\n        return arr\\n    else:\\n        pivot = arr[len(arr) // 2]\\n        left = [x for x in arr if x < pivot]\\n        middle = [x for x in arr if x == pivot]\\n        right = [x for x in arr if x > pivot]\\n        return quicksort(left) + middle + qui",
+   "run": 0,
+   "mode": "direct6",
+   "rc": 0,
+   "wall_s": 35,
+   "t_start": 1787780162.387342,
+   "t_end": 1787780197.1821802,
+   "cmd": "glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6"
+  },
+  {
+   "summary": "GENERATED 98 tokens in 27.4s = 3.58 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal",
+   "tok_s": 3.58,
+   "time_split": "time split: draft 2.5s (9%) | verify 23.6s (86%)",
+   "decoded": "'def quicksort(arr): \\n    if len(arr) <= 1:\\n        return arr\\n    else:\\n        pivot = arr[len(arr) // 2]\\n        left = [x for x in arr if x < pivot]\\n        middle = [x for x in arr if x == pivot]\\n        right = [x for x in arr if x > pivot]\\n        return quicksort(left) + middle + qui",
+   "run": 1,
+   "mode": "direct6",
+   "rc": 0,
+   "wall_s": 35,
+   "t_start": 1787780197.184453,
+   "t_end": 1787780231.914069,
+   "cmd": "glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6"
+  },
+  {
+   "summary": "GENERATED 98 tokens in 26.9s = 3.64 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal",
+   "tok_s": 3.64,
+   "time_split": "time split: draft 2.4s (9%) | verify 23.2s (86%)",
+   "decoded": "'def quicksort(arr): \\n    if len(arr) <= 1:\\n        return arr\\n    else:\\n        pivot = arr[len(arr) // 2]\\n        left = [x for x in arr if x < pivot]\\n        middle = [x for x in arr if x == pivot]\\n        right = [x for x in arr if x > pivot]\\n        return quicksort(left) + middle + qui",
+   "run": 2,
+   "mode": "direct6",
+   "rc": 0,
+   "wall_s": 34,
+   "t_start": 1787780231.916179,
+   "t_end": 1787780266.330944,
+   "cmd": "glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6"
+  }
+ ]
+}

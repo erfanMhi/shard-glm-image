@@ -143,7 +143,7 @@ def stage_launch_cmd(blk, nxt, ring, trace):
     # the stage exits, so the ssh never returns (this hung every launch on 2026-08-26). Only the nohup'd stage goes to the
     # background, with all three fds redirected.
     return (REAP + "rm -f /root/stage.log /root/stage_trace.jsonl; cd /root; "
-            f"echo {shlex.quote(('ring' if ring else 'relay') + ' ' + args)} > /root/stage.class; "
+            f"echo {shlex.quote(('ring' if ring else 'relay') + (' trace' if trace else '') + ' ' + args)} > /root/stage.class; "
             f"nohup setsid env {env}{PY} glm_swarm_nvfp4_kv.py {args} > /root/stage.log 2>&1 < /dev/null & "
             "sleep 1; echo launched")
 
@@ -162,7 +162,7 @@ def ensure_stages(chain, coord, ring, trace, timeout):
     todo = []
     for i, (inst, blk) in enumerate(chain):
         nxt = eps[i + 1] if i + 1 < len(chain) else (ep(coord) if ring else None)
-        want = ("ring" if ring else "relay") + " " + f"stage --layers {' '.join(map(str, blk))} --port {STAGE_PORT}" + (f" --next {nxt}" if nxt else "") + (" --ring" if ring else "")
+        want = ("ring" if ring else "relay") + (" trace" if trace else "") + " " + f"stage --layers {' '.join(map(str, blk))} --port {STAGE_PORT}" + (f" --next {nxt}" if nxt else "") + (" --ring" if ring else "")   # trace is part of the identity: a traced run must relaunch untraced stages
         cls, alive = stage_state(inst)
         if alive and cls == want:
             log(f"  stage{i} {inst['id']} layers {blk[0]}-{blk[-1]}: already up ({cls.split()[0]})"); continue

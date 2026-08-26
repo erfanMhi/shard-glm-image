@@ -1,0 +1,429 @@
+17:16:49 [1] instances
+17:16:49     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:16:49     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:16:49     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:16:49     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:16:49     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:16:49     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:16:49     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:16:49 [2] image check (vmoe venv + scripts)
+17:16:57   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:16:57   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:16:57   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:16:57   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:16:57   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:16:57   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:16:57   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:16:57 [3] RTT mesh
+17:16:57 mesh: measuring all-pairs TCP connect RTT (kills any listener on :29600 first)
+17:17:19      48819314    0.5   52.9   63.3   74.4   66.4   63.6    9.2
+17:17:19      48819315   53.5    2.9   41.5   48.0   45.8   47.3   51.4
+17:17:19      48819317   62.6   41.7    0.3   31.3   24.6   20.0   70.7
+17:17:19      48819324   75.2   48.6   31.2    0.3   11.2   10.3   73.2
+17:17:19      48819333   66.4   42.1   25.7   11.5    1.5    9.3   83.3
+17:17:19      48819336   64.0   47.1   20.8   11.4    9.4    0.1   67.4
+17:17:19      48819339    8.1   48.0   83.9   73.5   93.0   66.9   11.7
+17:17:19 [4] topology (shard.topology.optimal_loop, coordinator as depot)
+17:17:19     depot 48819314 (California, US): loop 207.5 ms
+17:17:19     depot 48819315 (Texas, US): loop 207.5 ms
+17:17:19     depot 48819317 (North Carolina, US): loop 207.5 ms
+17:17:19     depot 48819324 (Massachusetts, US): loop 207.5 ms
+17:17:19     depot 48819333 (Maryland, US): loop 207.5 ms
+17:17:19     depot 48819336 (New York, US): loop 207.5 ms
+17:17:19     depot 48819339 (California, US): loop 207.5 ms
+17:17:19     -> coordinator 48819324 (Massachusetts, US)
+17:17:19     loop cost 207.5 ms; stage order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336] (['Maryland, US', 'Texas, US', 'California, US', 'California, US', 'North Carolina, US', 'New York, US'])
+17:17:19     stage0: 48819333 (Maryland, US) layers 0-12
+17:17:19     stage1: 48819315 (Texas, US) layers 13-25
+17:17:19     stage2: 48819339 (California, US) layers 26-38
+17:17:19     stage3: 48819314 (California, US) layers 39-51
+17:17:19     stage4: 48819317 (North Carolina, US) layers 52-64
+17:17:19     stage5: 48819336 (New York, US) layers 65-77
+17:17:19     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:17:19 [mesh-only] coord 48819324 order [48819333, 48819315, 48819339, 48819314, 48819317, 48819336] -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/mesh/manifest.json
+17:17:19 [1] instances
+17:17:20     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:17:20     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:17:20     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:17:20     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:17:20     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:17:20     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:17:20     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:17:20 [2] image check (vmoe venv + scripts)
+17:17:27   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:17:27   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:17:27   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:17:27   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:17:27   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:17:27   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:17:27   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:17:27 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:17:27     stage0: 48819333 (Maryland, US) layers 0-12
+17:17:27     stage1: 48819315 (Texas, US) layers 13-25
+17:17:27     stage2: 48819339 (California, US) layers 26-38
+17:17:27     stage3: 48819314 (California, US) layers 39-51
+17:17:27     stage4: 48819317 (North Carolina, US) layers 52-64
+17:17:27     stage5: 48819336 (New York, US) layers 65-77
+17:17:27     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:17:27 [6] node_fetch (parallel; idempotent); pushing the current root/node_fetch.py first
+17:32:04     48819333: OK done model-00005-of-00045.safetensors |   done model-00006-of-00045.safetensors |   done model-00007-of-00045.safetensors | shards: 69.82 GB in 315s = 222 MB/s | total: 69.84 GB in 322s = 217 MB/s | NODE_FETCH_DONE
+17:32:04     48819315: OK done model-00012-of-00045.safetensors |   done model-00013-of-00045.safetensors |   done model-00014-of-00045.safetensors | shards: 79.98 GB in 720s = 111 MB/s | total: 80.01 GB in 727s = 110 MB/s | NODE_FETCH_DONE
+17:32:04     48819339: OK done model-00020-of-00045.safetensors |   done model-00021-of-00045.safetensors |   done model-00022-of-00045.safetensors | shards: 89.97 GB in 867s = 104 MB/s | total: 89.99 GB in 874s = 103 MB/s | NODE_FETCH_DONE
+17:32:04     48819314: OK done model-00027-of-00045.safetensors |   done model-00028-of-00045.safetensors |   done model-00029-of-00045.safetensors | shards: 79.98 GB in 777s = 103 MB/s | total: 80.00 GB in 784s = 102 MB/s | NODE_FETCH_DONE
+17:32:04     48819317: OK done model-00035-of-00045.safetensors |   done model-00036-of-00045.safetensors |   done model-00037-of-00045.safetensors | shards: 89.81 GB in 507s = 177 MB/s | total: 89.83 GB in 514s = 175 MB/s | NODE_FETCH_DONE
+17:32:04     48819336: OK done model-00042-of-00045.safetensors |   done model-00043-of-00045.safetensors |   done model-00044-of-00045.safetensors | shards: 78.40 GB in 696s = 113 MB/s | total: 78.42 GB in 703s = 112 MB/s | NODE_FETCH_DONE
+17:32:04     48819324: OK done special_tokens_map.json |   done tokenizer.json |   done tokenizer_config.json | draft: 18.82 GB in 453s = 42 MB/s | total: 39.18 GB in 829s = 47 MB/s | NODE_FETCH_DONE
+17:32:04 [7] stages (ring direct-return; trace=False)
+17:32:09   stage0 48819333 (Maryland, US): layers 0-12 -> 208.68.65.246:7325
+17:32:09   stage1 48819315 (Texas, US): layers 13-25 -> 54.151.2.77:40481
+17:32:09   stage2 48819339 (California, US): layers 26-38 -> 147.185.60.9:37743
+17:32:09   stage3 48819314 (California, US): layers 39-51 -> 136.56.33.107:24984
+17:32:09   stage4 48819317 (North Carolina, US): layers 52-64 -> 38.82.223.83:61848
+17:32:09   stage5 48819336 (New York, US): layers 65-77 -> 216.193.128.133:42561
+17:33:16   stage0: WARM in 63s
+17:33:16   stage1: WARM in 32s
+17:33:16   stage2: WARM in 33s
+17:33:16   stage3: WARM in 49s
+17:33:16   stage4: WARM in 32s
+17:33:16   stage5: WARM in 62s
+17:33:16 [8] run 0: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_0.json
+17:33:49     -> GENERATED 96 tokens in 4.3s = 22.45 tok/s | depth 6 K 2 compile=True | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:33:49        time split: draft 2.1s (49%) | recv-wait 2.2s (51%)
+17:33:49 [8] run 1: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_1.json
+17:34:07     -> GENERATED 96 tokens in 4.6s = 21.00 tok/s | depth 6 K 2 compile=True | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:34:07        time split: draft 2.1s (46%) | recv-wait 2.5s (54%)
+17:34:07 [8] run 2: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_2.json
+17:34:25     -> GENERATED 96 tokens in 4.6s = 20.95 tok/s | depth 6 K 2 compile=True | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:34:25        time split: draft 2.1s (46%) | recv-wait 2.5s (54%)
+17:34:25 [9] pull stage logs
+17:34:41 [done] cg: tok/s per run [22.45, 21.0, 20.95], median 21.00 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/cg/manifest.json
+17:34:41 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:34:41 [1] instances
+17:34:42     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:34:42     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:34:42     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:34:42     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:34:42     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:34:42     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:34:42     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:34:42 [2] image check (vmoe venv + scripts)
+17:34:49   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:34:49   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:34:49   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:34:49   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:34:49   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:34:49   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:34:49   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:34:49 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:34:49     stage0: 48819333 (Maryland, US) layers 0-12
+17:34:49     stage1: 48819315 (Texas, US) layers 13-25
+17:34:49     stage2: 48819339 (California, US) layers 26-38
+17:34:49     stage3: 48819314 (California, US) layers 39-51
+17:34:49     stage4: 48819317 (North Carolina, US) layers 52-64
+17:34:49     stage5: 48819336 (New York, US) layers 65-77
+17:34:49     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:34:49 [7] stages (ring direct-return; trace=False)
+17:34:50   stage0 48819333 layers 0-12: already up (ring)
+17:34:51   stage1 48819315 layers 13-25: already up (ring)
+17:34:52   stage2 48819339 layers 26-38: already up (ring)
+17:34:53   stage3 48819314 layers 39-51: already up (ring)
+17:34:53   stage4 48819317 layers 52-64: already up (ring)
+17:34:54   stage5 48819336 layers 65-77: already up (ring)
+17:34:54 [8] run 0: glm_swarm_nvfp4_pipe.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --prompt 'def quicksort(arr):' --max-new 96
+17:35:07     -> GENERATED 96 tokens in 4.2s = 22.66 tok/s | depth 6 K 2 | 48 valid traversals (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal
+17:35:07        time split: draft 2.0s (46%) | recv-wait 2.3s (53%)
+17:35:07 [8] run 1: glm_swarm_nvfp4_pipe.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --prompt 'def quicksort(arr):' --max-new 96
+17:35:20     -> GENERATED 96 tokens in 4.5s = 21.55 tok/s | depth 6 K 2 | 48 valid traversals (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal
+17:35:20        time split: draft 2.0s (44%) | recv-wait 2.5s (55%)
+17:35:20 [8] run 2: glm_swarm_nvfp4_pipe.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --prompt 'def quicksort(arr):' --max-new 96
+17:35:33     -> GENERATED 96 tokens in 4.6s = 20.78 tok/s | depth 6 K 2 | 48 valid traversals (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal
+17:35:33        time split: draft 2.0s (44%) | recv-wait 2.6s (56%)
+17:35:33 [9] pull stage logs
+17:35:49 [done] pipe: tok/s per run [22.66, 21.55, 20.78], median 21.55 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/pipe/manifest.json
+17:35:49 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:35:49 [1] instances
+17:35:50     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:35:50     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:35:50     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:35:50     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:35:50     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:35:50     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:35:50     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:35:50 [2] image check (vmoe venv + scripts)
+17:35:57   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:35:57   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:35:57   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:35:57   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:35:57   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:35:57   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:35:57   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:35:57 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:35:57     stage0: 48819333 (Maryland, US) layers 0-12
+17:35:57     stage1: 48819315 (Texas, US) layers 13-25
+17:35:57     stage2: 48819339 (California, US) layers 26-38
+17:35:57     stage3: 48819314 (California, US) layers 39-51
+17:35:57     stage4: 48819317 (North Carolina, US) layers 52-64
+17:35:57     stage5: 48819336 (New York, US) layers 65-77
+17:35:57     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:35:57 [7] stages (ring direct-return; trace=False)
+17:35:58   stage0 48819333 layers 0-12: already up (ring)
+17:35:59   stage1 48819315 layers 13-25: already up (ring)
+17:36:00   stage2 48819339 layers 26-38: already up (ring)
+17:36:01   stage3 48819314 layers 39-51: already up (ring)
+17:36:01   stage4 48819317 layers 52-64: already up (ring)
+17:36:02   stage5 48819336 layers 65-77: already up (ring)
+17:36:02 [8] run 0: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:36:37     -> GENERATED 98 tokens in 27.2s = 3.61 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:36:37        time split: draft 2.5s (9%) | verify 23.4s (86%)
+17:36:37 [8] run 1: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:37:11     -> GENERATED 98 tokens in 27.4s = 3.58 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:37:11        time split: draft 2.5s (9%) | verify 23.6s (86%)
+17:37:11 [8] run 2: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --ret-port 29600 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:37:46     -> GENERATED 98 tokens in 26.9s = 3.64 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:37:46        time split: draft 2.4s (9%) | verify 23.2s (86%)
+17:37:46 [9] pull stage logs
+17:38:02 [done] direct6: tok/s per run [3.61, 3.58, 3.64], median 3.61 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/direct6/manifest.json
+17:38:02 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:38:02 [1] instances
+17:38:02     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:38:02     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:38:02     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:38:02     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:38:02     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:38:02     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:38:02     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:38:02 [2] image check (vmoe venv + scripts)
+17:38:10   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:38:10   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:38:10   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:38:10   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:38:10   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:38:10   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:38:10   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:38:10 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:38:10     stage0: 48819333 (Maryland, US) layers 0-12
+17:38:10     stage1: 48819315 (Texas, US) layers 13-25
+17:38:10     stage2: 48819339 (California, US) layers 26-38
+17:38:10     stage3: 48819314 (California, US) layers 39-51
+17:38:10     stage4: 48819317 (North Carolina, US) layers 52-64
+17:38:10     stage5: 48819336 (New York, US) layers 65-77
+17:38:10     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:38:10 [7] stages (relay-back chain; trace=False)
+17:38:14   stage0 48819333 (Maryland, US): layers 0-12 -> 208.68.65.246:7325
+17:38:14   stage1 48819315 (Texas, US): layers 13-25 -> 54.151.2.77:40481
+17:38:14   stage2 48819339 (California, US): layers 26-38 -> 147.185.60.9:37743
+17:38:14   stage3 48819314 (California, US): layers 39-51 -> 136.56.33.107:24984
+17:38:14   stage4 48819317 (North Carolina, US): layers 52-64 -> 38.82.223.83:61848
+17:38:14   stage5 48819336 (New York, US): layers 65-77 -> (tail, relay-back)
+17:39:21   stage0: WARM in 32s
+17:39:21   stage1: WARM in 32s
+17:39:21   stage2: WARM in 33s
+17:39:21   stage3: WARM in 49s
+17:39:21   stage4: WARM in 32s
+17:39:21   stage5: WARM in 62s
+17:39:21 [8] run 0: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:40:06     -> GENERATED 98 tokens in 37.8s = 2.60 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:40:06        time split: draft 2.4s (6%) | verify 33.5s (89%)
+17:40:06 [8] run 1: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:40:51     -> GENERATED 98 tokens in 37.0s = 2.65 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:40:51        time split: draft 2.4s (7%) | verify 32.9s (89%)
+17:40:51 [8] run 2: glm_swarm_nvfp4_draft.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96 --K 6
+17:42:06     -> GENERATED 98 tokens in 68.5s = 1.43 tok/s | 26 traversals | mean accept 2.73 | 3.73 tok/traversal
+17:42:06        time split: draft 2.5s (4%) | verify 64.1s (94%)
+17:42:06 [9] pull stage logs
+17:42:25 [done] relay6: tok/s per run [2.6, 2.65, 1.43], median 2.60 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/relay6/manifest.json
+17:42:25 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:42:25 [1] instances
+17:42:26     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:42:26     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:42:26     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:42:26     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:42:26     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:42:26     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:42:26     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:42:26 [2] image check (vmoe venv + scripts)
+17:42:33   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:42:33   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:42:33   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:42:33   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:42:33   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:42:33   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:42:33   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:42:33 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:42:33     stage0: 48819333 (Maryland, US) layers 0-12
+17:42:33     stage1: 48819315 (Texas, US) layers 13-25
+17:42:33     stage2: 48819339 (California, US) layers 26-38
+17:42:33     stage3: 48819314 (California, US) layers 39-51
+17:42:33     stage4: 48819317 (North Carolina, US) layers 52-64
+17:42:33     stage5: 48819336 (New York, US) layers 65-77
+17:42:33     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:42:33 [7] stages (relay-back chain; trace=False)
+17:42:36   stage0 48819333 layers 0-12: already up (relay)
+17:42:37   stage1 48819315 layers 13-25: already up (relay)
+17:42:38   stage2 48819339 layers 26-38: already up (relay)
+17:42:39   stage3 48819314 layers 39-51: already up (relay)
+17:42:39   stage4 48819317 layers 52-64: already up (relay)
+17:42:40   stage5 48819336 layers 65-77: already up (relay)
+17:42:40 [8] run 0: glm_swarm_nvfp4_kv.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96
+17:44:07     -> GENERATED 96 tokens in 81.1s = 1.18 tok/s (NVFP4 distributed, KV-CACHED)
+17:44:07 [8] run 1: glm_swarm_nvfp4_kv.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96
+17:45:31     -> GENERATED 96 tokens in 77.8s = 1.23 tok/s (NVFP4 distributed, KV-CACHED)
+17:45:31 [8] run 2: glm_swarm_nvfp4_kv.py coord --stage 206.41.207.98:20828 --prompt 'def quicksort(arr):' --max-new 96
+17:46:36     -> GENERATED 96 tokens in 59.3s = 1.62 tok/s (NVFP4 distributed, KV-CACHED)
+17:46:36 [9] pull stage logs
+17:46:52 [done] plain: tok/s per run [1.18, 1.23, 1.62], median 1.23 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/plain/manifest.json
+17:46:52 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:46:52 [1] instances
+17:46:52     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:46:52     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:46:52     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:46:52     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:46:52     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:46:52     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:46:52     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:46:52 [2] image check (vmoe venv + scripts)
+17:47:00   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:47:00   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:47:00   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:47:00   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:47:00   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:47:00   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:47:00   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:47:00 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:47:00     stage0: 48819333 (Maryland, US) layers 0-12
+17:47:00     stage1: 48819315 (Texas, US) layers 13-25
+17:47:00     stage2: 48819339 (California, US) layers 26-38
+17:47:00     stage3: 48819314 (California, US) layers 39-51
+17:47:00     stage4: 48819317 (North Carolina, US) layers 52-64
+17:47:00     stage5: 48819336 (New York, US) layers 65-77
+17:47:00     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:47:00 [7] stages (ring direct-return; trace=False)
+17:47:04   stage0 48819333 (Maryland, US): layers 0-12 -> 208.68.65.246:7325
+17:47:04   stage1 48819315 (Texas, US): layers 13-25 -> 54.151.2.77:40481
+17:47:04   stage2 48819339 (California, US): layers 26-38 -> 147.185.60.9:37743
+17:47:04   stage3 48819314 (California, US): layers 39-51 -> 136.56.33.107:24984
+17:47:04   stage4 48819317 (North Carolina, US): layers 52-64 -> 38.82.223.83:61848
+17:47:04   stage5 48819336 (New York, US): layers 65-77 -> 216.193.128.133:42561
+17:48:11   stage0: WARM in 32s
+17:48:11   stage1: WARM in 32s
+17:48:11   stage2: WARM in 33s
+17:48:11   stage3: WARM in 33s
+17:48:11   stage4: WARM in 32s
+17:48:11   stage5: WARM in 62s
+17:48:11 [8] run 0: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cgeager_0.json
+17:48:25     -> GENERATED 96 tokens in 4.5s = 21.11 tok/s | depth 6 K 2 compile=False | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:48:25        time split: draft 2.6s (56%) | recv-wait 2.0s (44%)
+17:48:25 [9] pull stage logs
+17:48:41 [done] cgeager: tok/s per run [21.11], median 21.11 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/cgeager/manifest.json
+17:48:41 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:48:41 [1] instances
+17:48:41     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:48:41     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:48:41     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:48:41     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:48:41     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:48:41     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:48:41     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:48:41 [2] image check (vmoe venv + scripts)
+17:48:49   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:48:49   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:48:49   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:48:49   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:48:49   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:48:49   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:48:49   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:48:49 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:48:49     stage0: 48819333 (Maryland, US) layers 0-12
+17:48:49     stage1: 48819315 (Texas, US) layers 13-25
+17:48:49     stage2: 48819339 (California, US) layers 26-38
+17:48:49     stage3: 48819314 (California, US) layers 39-51
+17:48:49     stage4: 48819317 (North Carolina, US) layers 52-64
+17:48:49     stage5: 48819336 (New York, US) layers 65-77
+17:48:49     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:48:49 [7] stages (ring direct-return; trace=True)
+17:48:50   stage0 48819333 layers 0-12: already up (ring)
+17:48:51   stage1 48819315 layers 13-25: already up (ring)
+17:48:52   stage2 48819339 layers 26-38: already up (ring)
+17:48:53   stage3 48819314 layers 39-51: already up (ring)
+17:48:53   stage4 48819317 layers 52-64: already up (ring)
+17:48:54   stage5 48819336 layers 65-77: already up (ring)
+17:48:54 [8] run 0: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 6 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_0.json
+17:49:13     -> GENERATED 96 tokens in 4.4s = 21.82 tok/s | depth 6 K 2 compile=True | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:49:13        time split: draft 2.1s (48%) | recv-wait 2.3s (52%)
+17:49:13 [9] pull stage logs + traces
+17:49:35 [done] cg: tok/s per run [21.82], median 21.82 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/cgtrace/manifest.json
+17:49:35 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:49:35 [1] instances
+17:49:36     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:49:36     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:49:36     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:49:36     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:49:36     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:49:36     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:49:36     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:49:36 [2] image check (vmoe venv + scripts)
+17:49:43   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:49:43   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:49:43   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:49:43   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:49:43   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:49:43   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:49:43   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:49:43 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:49:43     stage0: 48819333 (Maryland, US) layers 0-12
+17:49:43     stage1: 48819315 (Texas, US) layers 13-25
+17:49:43     stage2: 48819339 (California, US) layers 26-38
+17:49:43     stage3: 48819314 (California, US) layers 39-51
+17:49:43     stage4: 48819317 (North Carolina, US) layers 52-64
+17:49:43     stage5: 48819336 (New York, US) layers 65-77
+17:49:43     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:49:43 [7] stages (ring direct-return; trace=False)
+17:49:43   stage0 48819333 layers 0-12: already up (ring)
+17:49:44   stage1 48819315 layers 13-25: already up (ring)
+17:49:45   stage2 48819339 layers 26-38: already up (ring)
+17:49:46   stage3 48819314 layers 39-51: already up (ring)
+17:49:47   stage4 48819317 layers 52-64: already up (ring)
+17:49:47   stage5 48819336 layers 65-77: already up (ring)
+17:49:47 [8] run 0: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 8 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_0.json
+17:50:04     -> GENERATED 96 tokens in 3.5s = 27.21 tok/s | depth 8 K 2 compile=True | 48 valid (+14 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:50:04        time split: draft 2.3s (65%) | recv-wait 1.2s (35%)
+17:50:04 [9] pull stage logs
+17:50:20 [done] cg: tok/s per run [27.21], median 27.21 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/sweep_d8_k2/manifest.json
+17:50:20 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.
+17:50:20 [1] instances
+17:50:21     48819314 label='erfan-glm-ring-california' California, US RTX PRO 6000 S ip=147.185.60.9 :37743 ssh:36944
+17:50:21     48819315 label='erfan-glm-ring-texas' Texas, US RTX PRO 6000 WS ip=208.68.65.246 :7325 ssh:7797
+17:50:21     48819317 label='erfan-glm-ring-north_carolina' North Carolina, US RTX PRO 6000 WS ip=136.56.33.107 :24984 ssh:25505
+17:50:21     48819324 label='erfan-glm-ring-massachusetts' Massachusetts, US RTX PRO 6000 WS ip=216.193.128.133 :42561 ssh:42546
+17:50:21     48819333 label='erfan-glm-ring-maryland' Maryland, US RTX PRO 6000 S ip=206.41.207.98 :20828 ssh:32098
+17:50:21     48819336 label='erfan-glm-ring-new_york' New York, US RTX PRO 6000 S ip=38.82.223.83 :61848 ssh:61793
+17:50:21     48819339 label='erfan-glm-ring-california2' California, US RTX PRO 6000 WS ip=54.151.2.77 :40481 ssh:40404
+17:50:21 [2] image check (vmoe venv + scripts)
+17:50:28   48819314: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.95.05 | SCRIPTS_OK
+17:50:28   48819315: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 610.57.04 | SCRIPTS_OK
+17:50:28   48819317: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition, 97887 MiB, 595.58.03 | SCRIPTS_OK
+17:50:28   48819324: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.71.05 | SCRIPTS_OK
+17:50:28   48819333: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 590.48.01 | SCRIPTS_OK
+17:50:28   48819336: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Server Edition | NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB, 580.173.02 | SCRIPTS_OK
+17:50:28   48819339: OK 2.11.0+cu130 0.23.0 5.12.1 True NVIDIA RTX PRO 6000 Blackwell Workstation Edition | NVIDIA RTX PRO 6000 Blackwell Workstation Edition, 97887 MiB, 595.84 | SCRIPTS_OK
+17:50:28 [3-4] explicit ring order: [48819333, 48819315, 48819339, 48819314, 48819317, 48819336]
+17:50:28     stage0: 48819333 (Maryland, US) layers 0-12
+17:50:28     stage1: 48819315 (Texas, US) layers 13-25
+17:50:28     stage2: 48819339 (California, US) layers 26-38
+17:50:28     stage3: 48819314 (California, US) layers 39-51
+17:50:28     stage4: 48819317 (North Carolina, US) layers 52-64
+17:50:28     stage5: 48819336 (New York, US) layers 65-77
+17:50:28     coord: 48819324 (Massachusetts, US) ret 216.193.128.133:42561
+17:50:28 [7] stages (ring direct-return; trace=False)
+17:50:28   stage0 48819333 layers 0-12: already up (ring)
+17:50:29   stage1 48819315 layers 13-25: already up (ring)
+17:50:30   stage2 48819339 layers 26-38: already up (ring)
+17:50:31   stage3 48819314 layers 39-51: already up (ring)
+17:50:32   stage4 48819317 layers 52-64: already up (ring)
+17:50:32   stage5 48819336 layers 65-77: already up (ring)
+17:50:32 [8] run 0: glm_swarm_nvfp4_cg.py coord --stage 206.41.207.98:20828 --ret-port 29600 --depth 10 --K 2 --compile --prompt 'def quicksort(arr):' --max-new 96 --dump /root/run_cg_0.json
+17:50:50     -> GENERATED 96 tokens in 4.5s = 21.49 tok/s | depth 10 K 2 compile=True | 48 valid (+18 stale) | mean accept 1.94 | 2.94 tok/valid-traversal | sha d9e61275084c receipt_match=True
+17:50:50        time split: draft 2.5s (56%) | recv-wait 2.0s (44%)
+17:50:50 [9] pull stage logs
+17:51:06 [done] cg: tok/s per run [21.49], median 21.49 -> /private/tmp/claude-501/-Users-oriea-Projects-mac-wan-pp-transfer/1bba68cc-ab1c-45f3-a60a-07db6617a3a3/scratchpad/shard-glm-image/runs/ring-20260826-1713/sweep_d10_k2/manifest.json
+17:51:06 stages stay up. Teardown is manual: vastai destroy instance <id> for every erfan-glm-* id, after the artifacts are copied.

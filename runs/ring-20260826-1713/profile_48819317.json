@@ -1,0 +1,76 @@
+{
+ "utc": "2026-08-26T21:16:45Z",
+ "hostname": "16a8e666755a",
+ "gpu": [
+  {
+   "name": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+   "uuid": "GPU-f81d9f36-a2ba-eaf7-74b3-938351aeba64",
+   "power_limit_W": "300.00 W",
+   "power_max_limit_W": "325.00 W",
+   "clocks_max_sm_MHz": "3090 MHz",
+   "clocks_max_mem_MHz": "14001 MHz",
+   "pcie_gen_max": "5",
+   "pcie_width_max": "16",
+   "memory_total_MiB": "97887 MiB",
+   "driver_version": "595.58.03"
+  }
+ ],
+ "torch": {
+  "python": "3.12.3",
+  "torch": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "vllm": "0.23.0",
+  "transformers": "5.12.1",
+  "huggingface_hub": "1.19.0",
+  "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+  "compute_capability": "12.0",
+  "gpu_mem_free_GB": 101.4,
+  "gpu_mem_total_GB": 102.0,
+  "copy_4GB_x10_s": 0.0586,
+  "mem_bw_GBps_read_plus_write": 1466.4,
+  "frame_bytes_1x3x6144_bf16": 38441,
+  "pickle_save_ms": {
+   "mean": 0.136,
+   "p50": 0.113,
+   "p90": 0.126,
+   "min": 0.108
+  },
+  "pickle_load_ms": {
+   "mean": 0.138,
+   "p50": 0.132,
+   "p90": 0.146,
+   "min": 0.123
+  },
+  "pickle_roundtrip_ms": {
+   "mean": 0.274,
+   "p50": 0.246,
+   "p90": 0.275,
+   "min": 0.232
+  }
+ },
+ "disk": {
+  "write_MBps_direct": 4524.7,
+  "read_MBps_direct": 7856.1,
+  "df_root": "overlay         150G   15G  136G  10% /"
+ },
+ "sysctl": {
+  "net.ipv4.tcp_slow_start_after_idle": "1",
+  "net.ipv4.tcp_congestion_control": "cubic",
+  "net.ipv4.tcp_rmem": "4096 131072 33554432",
+  "net.ipv4.tcp_wmem": "4096 16384 4194304",
+  "net.core.rmem_max": "212992",
+  "net.core.wmem_max": "212992",
+  "net.ipv4.tcp_window_scaling": "1"
+ },
+ "mtu": {
+  "eth0": "1500",
+  "lo": "65536"
+ },
+ "default_iface": "eth0",
+ "cpu": {
+  "nproc": 128,
+  "model": "AMD EPYC 9354 32-Core Processor"
+ },
+ "public_ip": "136.56.33.107",
+ "vast_env": {}
+}

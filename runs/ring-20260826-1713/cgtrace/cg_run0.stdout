@@ -1,0 +1,16 @@
+/root/vmoe/lib/python3.12/site-packages/huggingface_hub/constants.py:298: FutureWarning: The `HF_HUB_ENABLE_HF_TRANSFER` environment variable is deprecated as 'hf_transfer' is not used anymore. Please use `HF_XET_HIGH_PERFORMANCE` instead to enable high performance transfer with Xet. Visit https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables#hfxethighperformance for more details.
+  warnings.warn(
+coord(CG depth=6 K=2 compile=True) -> head 206.41.207.98:20828; tail returns on :29600
+loading draft GLM-4-9B...
+
+Loading weights:   0%|          | 0/523 [00:00<?, ?it/s]
+Loading weights: 100%|██████████| 523/523 [00:00<00:00, 30646.15it/s]
+draft loaded (22.7 GB)
+
+GENERATED 96 tokens in 4.4s = 21.82 tok/s | depth 6 K 2 compile=True | 48 valid (+10 stale) | mean accept 1.94 | 2.94 tok/valid-traversal
+  time split: draft 2.1s (48%) | recv-wait 2.3s (52%)
+decoded: 'def quicksort(arr): \n    if len(arr) <= 1:\n        return arr\n    else:\n        pivot = arr[0]\n        left = [x for x in arr[1:] if x < pivot]\n        right = [x for x in arr[1:] if x >= pivot]\n        return quicksort(left) + [pivot] + quicksort(right)\n\n# Example usage:\narr = [3, 6, 8, 10, 1, 2'
+dumped run -> /root/run_cg_0.json
+Warning: Permanently added '[216.193.128.133]:42546' (ED25519) to the list of known hosts.
+Welcome to vast.ai. If authentication fails, try again after a few seconds, and double check your ssh key.
+Have fun!
