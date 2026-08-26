@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=16s status= ip= p22= p29= 
+t=32s status=loading ip=8.17.147.71 p22=None p29=None 3682b59d08bd:
+t=48s status=loading ip=8.17.147.71 p22=None p29=None adf166f88ef9:
+t=64s status=loading ip=8.17.147.71 p22=None p29=None 7c523df42be5:
+t=80s status=loading ip=8.17.147.71 p22=None p29=None 7c523df42be5:
+t=95s status=loading ip=8.17.147.71 p22=None p29=None 3682b59d08bd:
+t=111s status=loading ip=8.17.147.71 p22=None p29=None 7c523df42be5:
+t=127s status=loading ip=8.17.147.71 p22=None p29=None 7c523df42be5:
+t=143s status=loading ip=8.17.147.71 p22=None p29=None 81d402023cd3:
+t=158s status=loading ip=8.17.147.71 p22=None p29=None 33d3fcda5984:
+t=174s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=190s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=206s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=221s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=237s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=253s status=loading ip=8.17.147.71 p22=None p29=None b185c791d87a:
+t=269s status=loading ip=8.17.147.71 p22=None p29=None #7

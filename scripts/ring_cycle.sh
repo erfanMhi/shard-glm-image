@@ -17,12 +17,26 @@ SPARE=${SPARE:-1}; log "rent $((N+SPARE)) boxes ($N needed, $SPARE spare against
 [ "$(wc -l < "$RING_IDS" | tr -d ' ')" -ge "$N" ] || fail "rented fewer than $N"
 log "RENTED $(awk '{print $1}' "$RING_IDS" | paste -sd, -)"
 
-log "wait for ssh (cap 20 min, parallel); keep the first $N that come up"
-for id in $(awk '{print $1}' "$RING_IDS"); do ( bash "$IMG/../vast/wait_ssh.sh" "$id" 1200 > "$RUNS/wait_$id.txt" 2>"$RUNS/wait_$id.log" ) & done
-while :; do n=$(cat "$RUNS"/wait_*.txt 2>/dev/null | grep -c READY); [ "$n" -ge "$N" ] && break; [ "$(jobs -r | wc -l | tr -d ' ')" -eq 0 ] && break; sleep 10; done
+wait_boxes() {  # $1 = cap seconds; start a waiter for every id in RING_IDS that is not READY yet, return when N are READY or all waiters ended
+  for id in $(awk '{print $1}' "$RING_IDS"); do grep -q READY "$RUNS/wait_$id.txt" 2>/dev/null && continue
+    ( bash "$IMG/../vast/wait_ssh.sh" "$id" "$1" > "$RUNS/wait_$id.txt" 2>"$RUNS/wait_$id.log" ) & done
+  while :; do n=$(cat "$RUNS"/wait_*.txt 2>/dev/null | grep -c READY); [ "$n" -ge "$N" ] && break; [ "$(jobs -r | wc -l | tr -d ' ')" -eq 0 ] && break; sleep 10; done
+}
+log "wait for ssh (cap 15 min, parallel); keep the first $N that come up; boxes that never boot are replaced from other hosts"
+wait_boxes 900
+for round in 1 2; do
+  R=$(cat "$RUNS"/wait_*.txt 2>/dev/null | grep -c READY); [ "$R" -ge "$N" ] && break
+  BAD=""; for id in $(awk '{print $1}' "$RING_IDS"); do grep -q READY "$RUNS/wait_$id.txt" 2>/dev/null || BAD="$BAD $id"; done
+  for id in $BAD; do h=$(awk -v i="$id" '$1==i{print $5}' "$RING_IDS"); EXCLUDE_HOSTS="${EXCLUDE_HOSTS:-}${EXCLUDE_HOSTS:+,}$h"; rm -f "$RUNS/wait_$id.txt"; log "release unbooted box $id (host $h)"; bash "$HERE/ring_down.sh" "$id" | sed 's/^/    /'; done
+  grep -v -E "^($(echo $BAD | tr ' ' '|')) " "$RING_IDS" > "$RING_IDS.tmp" && mv "$RING_IDS.tmp" "$RING_IDS"
+  need=$(( N - R )); log "top-up round $round: $R ready, renting $need more (excluding hosts $EXCLUDE_HOSTS)"
+  APPEND=1 EXCLUDE_HOSTS="$EXCLUDE_HOSTS" bash "$HERE/ring_up.sh" "$need" 2>&1 | tee -a "$RUNS/ring_up.log" | sed 's/^/    /'
+  wait_boxes 900
+done
+wait 2>/dev/null
 KEEP=$(grep -l READY "$RUNS"/wait_*.txt | head -n "$N" | sed 's/.*wait_\([0-9]*\)\.txt/\1/' | paste -sd, -)
 READY=$(echo "$KEEP" | tr ',' '\n' | grep -c .); log "READY $READY/$N kept: $KEEP"; cat "$RUNS"/wait_*.txt | sed 's/^/    /'
-[ "$READY" -ge "$N" ] || { wait; fail "only $READY boxes reachable"; }
+[ "$READY" -ge "$N" ] || fail "only $READY boxes reachable after top-ups"
 for id in $(awk '{print $1}' "$RING_IDS"); do case ",$KEEP," in *,$id,*) ;; *) log "release extra box $id"; bash "$HERE/ring_down.sh" "$id" | sed 's/^/    /';; esac; done
 grep -E "^($(echo "$KEEP" | tr ',' '|')) " "$RING_IDS" > "$RING_IDS.kept"; RING_IDS="$RING_IDS.kept"; IDS=$KEEP
 COORD=$(awk 'NR==1{print $1}' "$RING_IDS")   # placeholder; --auto-coord picks the real one

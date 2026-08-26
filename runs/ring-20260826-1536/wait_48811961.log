@@ -1,0 +1,468 @@
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=16s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=32s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=48s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=64s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=79s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=95s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=111s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=127s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=143s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=158s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=174s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=190s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=206s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=221s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=237s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=253s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=269s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=284s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=300s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=316s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=331s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=347s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=363s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=379s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=394s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=410s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=425s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=441s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=457s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=472s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=488s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=504s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=519s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=535s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=550s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=566s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=582s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=597s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=613s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=629s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=644s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=660s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=676s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=691s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=707s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=723s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=739s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=755s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=770s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=786s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=802s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=817s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=833s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=849s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=864s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=880s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=896s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=912s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=927s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=943s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=958s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=974s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=990s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1005s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1021s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1037s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1053s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1068s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1084s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1100s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1115s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1131s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1147s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1162s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1178s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1194s status= ip= p22= p29= 
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+    print(i.get("actual_status"), i.get("public_ipaddr"), s22, s29, i.get("status_msg","")[:60].replace("\n"," ")); break
+                                                                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+t=1210s status= ip= p22= p29= 
