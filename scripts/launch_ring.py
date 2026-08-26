@@ -272,7 +272,7 @@ def main():
     if not a.skip_fetch:
         log("[6] node_fetch (parallel; idempotent)")
         tok = os.environ.get("HF_TOKEN")
-        envp = f"HF_TOKEN={shlex.quote(tok)} " if tok else ""
+        envp = ("HF_XET_HIGH_PERFORMANCE=1 " + (f"HF_TOKEN={shlex.quote(tok)} " if tok else ""))   # hub 1.19 downloads via xet; HF_HUB_ENABLE_HF_TRANSFER is deprecated
         def dl(item):
             inst, blk = item
             args = f"--coord --draft {a.draft_repo}" if blk is None else f"--layers {' '.join(map(str, blk))}"
