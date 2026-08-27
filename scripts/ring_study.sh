@@ -93,15 +93,15 @@ LR --mode cg --runs 2 --order "$ORDER" --prompt "def quicksort(arr):" --out "$RU
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); ok=[r.get("matches_receipt") for r in d["results"]]; print("receipt_match:", ok); sys.exit(0 if all(ok) else 1)' "$RUNS/sanity/manifest.json" || fail "output does not match the receipt"
 
 log "VALIDATE multi-prompt path on 10 prompts (code-000 first AND code-000-again last must both reproduce the receipt sha)"
-STUDY validate cgmulti 6 2 "$RUNS/prompts10.jsonl" 1 --skip-fetch || fail "validate"
+STUDY validate cgmulti 6 2 "$RUNS/prompts10.jsonl" 1 --skip-fetch --configs 6:2,8:2 || fail "validate"   # also exercises the per-prompt configuration rotation and the drain between them
 python3 - "$RUNS/validate" <<'PY' || fail "multi-prompt path does not reproduce the receipt on code-000 / code-000-again"
 import json, glob, sys
 fs = glob.glob(sys.argv[1] + "/results_*.jsonl")
 rows = [json.loads(l) for l in open(fs[0])] if fs else []
-r0 = {r["id"]: r for r in rows if r.get("id") in ("code-000", "code-000-again")}
-for k, r in sorted(r0.items()): print(f"{k}: {r.get('tok_s')} tok/s, ntok {r.get('ntok')}, sha {str(r.get('output_sha', ''))[:12]}, error {r.get('error')}")
+r0 = [r for r in rows if r.get("id") in ("code-000", "code-000-again")]
+for r in r0: print(f"{r['id']} d{r.get('depth')} k{r.get('K')}: {r.get('tok_s')} tok/s, ntok {r.get('ntok')}, sha {str(r.get('output_sha', ''))[:12]}, error {r.get('error')}")
 print("n =", len(rows), "ok =", sum(1 for r in rows if "tok_s" in r), "errors =", sum(1 for r in rows if "error" in r))
-sys.exit(0 if len(r0) == 2 and all(str(r.get("output_sha", "")).startswith("d9e61275084cb2bf") for r in r0.values()) else 1)
+sys.exit(0 if len(r0) == 4 and all(str(r.get("output_sha", "")).startswith("d9e61275084cb2bf") for r in r0) and sum(1 for r in rows if "error" in r) == 0 else 1)
 PY
 
 # ---- main study: every prompt runs all seven (depth, K) configurations back to back in rotating order; two halves = two time blocks ----
