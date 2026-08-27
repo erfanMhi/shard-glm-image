@@ -1,0 +1,101 @@
+{"id": "code-000", "cat": "code", "prompt": "def quicksort(arr):"}
+{"id": "code-001", "cat": "code", "prompt": "def binary_search(sorted_list, target):\n    \"\"\"Return the index of target in sorted_list, or -1 if absent.\"\"\""}
+{"id": "code-002", "cat": "code", "prompt": "class LRUCache:\n    \"\"\"A least-recently-used cache with a fixed capacity.\"\"\"\n    def __init__(self, capacity):"}
+{"id": "code-003", "cat": "code", "prompt": "def parse_csv_line(line, delimiter=\",\"):\n    \"\"\"Split one CSV line into fields, honoring double-quoted fields.\"\"\""}
+{"id": "code-004", "cat": "code", "prompt": "def is_palindrome(s):\n    \"\"\"Return True if s reads the same forwards and backwards, ignoring case and non-letters.\"\"\""}
+{"id": "code-005", "cat": "code", "prompt": "import numpy as np\n\ndef softmax(x, axis=-1):\n    \"\"\"Numerically stable softmax along the given axis.\"\"\""}
+{"id": "code-006", "cat": "code", "prompt": "def read_lines_with_numbers(path):\n    \"\"\"Yield (line_number, line) pairs for each line in the file at path.\"\"\""}
+{"id": "code-007", "cat": "code", "prompt": "class Stack:\n    \"\"\"A simple LIFO stack backed by a Python list.\"\"\""}
+{"id": "code-008", "cat": "code", "prompt": "import unittest\n\nclass TestFibonacci(unittest.TestCase):\n    def test_small_values(self):"}
+{"id": "code-009", "cat": "code", "prompt": "def merge_sorted(a, b):\n    \"\"\"Merge two sorted lists into one sorted list in O(len(a) + len(b)) time.\"\"\""}
+{"id": "code-010", "cat": "code", "prompt": "def word_frequencies(text):\n    \"\"\"Return a dict mapping each lowercase word in text to its count.\"\"\""}
+{"id": "code-011", "cat": "code", "prompt": "def newton_sqrt(x, tol=1e-10):\n    \"\"\"Approximate the square root of x with Newton's method.\"\"\""}
+{"id": "code-012", "cat": "code", "prompt": "class BinaryTreeNode:\n    def __init__(self, value, left=None, right=None):\n        self.value = value"}
+{"id": "code-013", "cat": "code", "prompt": "def flatten(nested):\n    \"\"\"Flatten an arbitrarily nested list of lists into a single flat list.\"\"\""}
+{"id": "code-014", "cat": "code", "prompt": "def matrix_multiply(a, b):\n    \"\"\"Multiply two matrices given as lists of lists; raise ValueError on a shape mismatch.\"\"\""}
+{"id": "code-015", "cat": "code", "prompt": "from dataclasses import dataclass\n\n@dataclass\nclass Point:"}
+{"id": "code-016", "cat": "code", "prompt": "def tokenize_expression(expr):\n    \"\"\"Split an arithmetic expression such as 3 + 4*(2 - 1) into a list of tokens.\"\"\""}
+{"id": "code-017", "cat": "code", "prompt": "function debounce(fn, delayMs) {\n  // Return a debounced version of fn that waits delayMs after the last call."}
+{"id": "code-018", "cat": "code", "prompt": "function deepClone(obj) {\n  // Return a deep copy of obj, handling arrays, plain objects, and Dates."}
+{"id": "code-019", "cat": "code", "prompt": "async function fetchJsonWithRetry(url, retries = 3) {"}
+{"id": "code-020", "cat": "code", "prompt": "class EventEmitter {\n  constructor() {\n    this.listeners = new Map();\n  }"}
+{"id": "code-021", "cat": "code", "prompt": "// Return an array of the k most frequent elements in nums.\nfunction topKFrequent(nums, k) {"}
+{"id": "code-022", "cat": "code", "prompt": "type User = { id: number; name: string; email: string };\n\nfunction groupByDomain(users: User[]): Map<string, User[]> {"}
+{"id": "code-023", "cat": "code", "prompt": "export function parseQueryString(qs: string): Record<string, string> {\n  // Parse 'a=1&b=hello%20world' into an object with decoded values."}
+{"id": "code-024", "cat": "code", "prompt": "function isValidParentheses(s) {\n  // Return true if every bracket in s is closed in the correct order.\n  const stack = [];"}
+{"id": "code-025", "cat": "code", "prompt": "/// Return the nth Fibonacci number using an iterative loop.\nfn fibonacci(n: u32) -> u64 {"}
+{"id": "code-026", "cat": "code", "prompt": "use std::collections::HashMap;\n\n/// Count how many times each word occurs in the input text.\nfn word_count(text: &str) -> HashMap<String, usize> {"}
+{"id": "code-027", "cat": "code", "prompt": "/// A fixed-capacity ring buffer of f64 samples.\npub struct RingBuffer {\n    data: Vec<f64>,"}
+{"id": "code-028", "cat": "code", "prompt": "/// Parse a line like \"key=value\" into a (key, value) pair, trimming whitespace.\nfn parse_key_value(line: &str) -> Option<(&str, &str)> {"}
+{"id": "code-029", "cat": "code", "prompt": "// Reverse returns s with its runes in reverse order.\nfunc Reverse(s string) string {"}
+{"id": "code-030", "cat": "code", "prompt": "// ReadLines reads the file at path and returns its lines without trailing newlines.\nfunc ReadLines(path string) ([]string, error) {"}
+{"id": "code-031", "cat": "code", "prompt": "// Queue is a FIFO queue of ints backed by a slice.\ntype Queue struct {"}
+{"id": "code-032", "cat": "code", "prompt": "func TestMax(t *testing.T) {\n\tcases := []struct{ in []int; want int }{"}
+{"id": "code-033", "cat": "code", "prompt": "/* Return the length of the longest common prefix of the two strings. */\nsize_t common_prefix_len(const char *a, const char *b) {"}
+{"id": "code-034", "cat": "code", "prompt": "#include <stdio.h>\n\n/* Read integers from stdin until EOF and print their sum. */\nint main(void) {"}
+{"id": "code-035", "cat": "code", "prompt": "template <typename T>\nclass Matrix {\npublic:\n    Matrix(size_t rows, size_t cols)"}
+{"id": "code-036", "cat": "code", "prompt": "// Swap the byte order of a 32-bit unsigned integer.\nuint32_t swap_endian(uint32_t x) {"}
+{"id": "code-037", "cat": "code", "prompt": "-- Return each customer's name and total spend over the last 30 days, highest spend first.\nSELECT"}
+{"id": "code-038", "cat": "code", "prompt": "-- Table: employees(id, name, department, salary). Find the second highest salary in each department.\nWITH ranked AS ("}
+{"id": "code-039", "cat": "code", "prompt": "#!/usr/bin/env bash\n# Back up every .log file in the given directory into a dated tar.gz archive.\nset -euo pipefail"}
+{"id": "code-040", "cat": "code", "prompt": "#!/bin/bash\n# Print the 10 largest files under the current directory with human-readable sizes.\nfind . -type f"}
+{"id": "prose-001", "cat": "prose", "prompt": "The first time I saw the ocean, I was eleven years old and convinced that"}
+{"id": "prose-002", "cat": "prose", "prompt": "Product description: The Meridian desk lamp combines a weighted brass base with a fully articulated arm, so"}
+{"id": "prose-003", "cat": "prose", "prompt": "Dear Ms. Alvarez,\n\nThank you for your letter of March 3rd regarding the community garden proposal. After discussing it with the council,"}
+{"id": "prose-004", "cat": "prose", "prompt": "The lighthouse keeper had not spoken to another person in forty days, and he had begun to"}
+{"id": "prose-005", "cat": "prose", "prompt": "The Great Barrier Reef, located off the coast of Queensland, Australia, is the world's largest coral reef system. It"}
+{"id": "prose-006", "cat": "prose", "prompt": "Essay: Why cities should plant more trees\n\nEvery summer, the difference between a shaded street and an exposed one"}
+{"id": "prose-007", "cat": "prose", "prompt": "Once upon a time, in a village at the edge of a forest that no map agreed on, there lived"}
+{"id": "prose-008", "cat": "prose", "prompt": "The printing press, introduced to Europe by Johannes Gutenberg around 1440, transformed"}
+{"id": "prose-009", "cat": "prose", "prompt": "To whom it may concern,\n\nI am writing to recommend Daniel Okafor for the position of senior data engineer. In the three years"}
+{"id": "prose-010", "cat": "prose", "prompt": "Introducing the Northwind travel backpack: forty liters of thoughtfully divided space, a laptop sleeve that"}
+{"id": "prose-011", "cat": "prose", "prompt": "The detective set down her coffee, looked at the photograph a second time, and realized"}
+{"id": "prose-012", "cat": "prose", "prompt": "Photosynthesis is the process by which green plants, algae, and some bacteria convert light energy into"}
+{"id": "prose-013", "cat": "prose", "prompt": "On the morning the river froze, the whole town came out to look, because"}
+{"id": "prose-014", "cat": "prose", "prompt": "A short history of the bicycle\n\nThe earliest two-wheeled machines of the 1810s had no pedals; riders"}
+{"id": "prose-015", "cat": "prose", "prompt": "Review: The new neighborhood bakery opened last Saturday, and by nine in the morning the line"}
+{"id": "prose-016", "cat": "prose", "prompt": "Dear future me,\n\nIf you are reading this, it means the time capsule survived and"}
+{"id": "prose-017", "cat": "prose", "prompt": "The Silk Road was not a single road but a network of trade routes that"}
+{"id": "prose-018", "cat": "prose", "prompt": "My grandmother kept a notebook of every recipe she ever changed, and the margins"}
+{"id": "prose-019", "cat": "prose", "prompt": "Blog post: What I learned from a year without a smartphone\n\nThe first week was the hardest, mostly because"}
+{"id": "prose-020", "cat": "prose", "prompt": "Mount Kilimanjaro, a dormant volcano in Tanzania, is the highest mountain in Africa. Its three volcanic cones"}
+{"id": "reasoning-001", "cat": "reasoning", "prompt": "A train leaves the station at 9:00 am traveling 60 miles per hour. A second train leaves the same station at 10:30 am traveling 90 miles per hour on a parallel track. At what time does the second train catch up? Answer:"}
+{"id": "reasoning-002", "cat": "reasoning", "prompt": "Alice is older than Bob. Carol is younger than Bob but older than Dave. Who is the second youngest of the four? Answer:"}
+{"id": "reasoning-003", "cat": "reasoning", "prompt": "A shop sells pens at 3 for 2 dollars. How much do 18 pens cost, and how many pens can you buy with 10 dollars? Answer:"}
+{"id": "reasoning-004", "cat": "reasoning", "prompt": "Why does a metal spoon feel colder than a wooden spoon when both have been sitting in the same room? Explain step by step."}
+{"id": "reasoning-005", "cat": "reasoning", "prompt": "You have a 3 liter jug and a 5 liter jug and unlimited water. How can you measure exactly 4 liters? Give the steps."}
+{"id": "reasoning-006", "cat": "reasoning", "prompt": "A rectangle has a perimeter of 30 cm and its length is twice its width. What is its area in square centimeters? Answer:"}
+{"id": "reasoning-007", "cat": "reasoning", "prompt": "If all bloops are razzies and some razzies are lazzies, does it follow that some bloops are lazzies? Explain your reasoning."}
+{"id": "reasoning-008", "cat": "reasoning", "prompt": "Why does ice float on water while most solids sink in their own liquid? Explain the mechanism in a few steps."}
+{"id": "reasoning-009", "cat": "reasoning", "prompt": "You need to cook three dishes that take 20, 35, and 50 minutes and you have two burners. What is the shortest time to finish all three, and in what order? Answer:"}
+{"id": "reasoning-010", "cat": "reasoning", "prompt": "A bat and a ball cost 1.10 dollars in total. The bat costs one dollar more than the ball. How much does the ball cost? Answer:"}
+{"id": "reasoning-011", "cat": "reasoning", "prompt": "Three boxes are labeled apples, oranges, and mixed, but every label is wrong. You may draw one fruit from one box. How do you relabel all three correctly? Answer:"}
+{"id": "reasoning-012", "cat": "reasoning", "prompt": "Why do we see lightning before we hear the thunder from the same strike? Explain step by step."}
+{"id": "reasoning-013", "cat": "reasoning", "prompt": "A bookshelf holds 120 books. Two fifths are fiction and a quarter of the rest are biographies. How many biographies are there? Answer:"}
+{"id": "reasoning-014", "cat": "reasoning", "prompt": "A farmer has chickens and cows with 30 heads and 74 legs in total. How many of each animal does the farmer have? Answer:"}
+{"id": "reasoning-015", "cat": "reasoning", "prompt": "Why does bread dough rise, and why does it stop rising once it is baked? Explain the two reasons in order."}
+{"id": "reasoning-016", "cat": "reasoning", "prompt": "Plan a 6 hour workday that fits a 90 minute meeting, two 2 hour focus blocks, and a 30 minute lunch, with the meeting not first. Give the schedule."}
+{"id": "reasoning-017", "cat": "reasoning", "prompt": "The sum of three consecutive even numbers is 78. What is the largest of the three? Answer:"}
+{"id": "reasoning-018", "cat": "reasoning", "prompt": "Why does a helium balloon rise in air but a balloon filled with your breath sinks? Explain the reasoning."}
+{"id": "reasoning-019", "cat": "reasoning", "prompt": "Every knight tells the truth and every knave lies. Person A says: 'We are both knaves.' What are A and B? Answer:"}
+{"id": "reasoning-020", "cat": "reasoning", "prompt": "A recipe for 4 people needs 300 grams of rice. You are cooking for 10 people but only have 600 grams. How many people can you serve fully, and how much rice is left over? Answer:"}
+{"id": "instruct-001", "cat": "instruct", "prompt": "Write a haiku about a city waking up on a rainy morning."}
+{"id": "instruct-002", "cat": "instruct", "prompt": "List five common mistakes people make when learning to cook, with one sentence on how to avoid each."}
+{"id": "instruct-003", "cat": "instruct", "prompt": "Summarize the difference between a process and a thread in an operating system in three sentences."}
+{"id": "instruct-004", "cat": "instruct", "prompt": "Give step-by-step instructions to change a flat bicycle tire using only a hand pump and a tire lever."}
+{"id": "instruct-005", "cat": "instruct", "prompt": "Write a two-sentence product tagline for a reusable water bottle that keeps drinks cold for 24 hours."}
+{"id": "instruct-006", "cat": "instruct", "prompt": "Explain to a ten year old how a vaccine trains the immune system, using one simple analogy."}
+{"id": "instruct-007", "cat": "instruct", "prompt": "Draft a polite email declining a meeting invitation and proposing two alternative times next week."}
+{"id": "instruct-008", "cat": "instruct", "prompt": "List the planets of the solar system in order from the sun, with one distinguishing fact about each."}
+{"id": "instruct-009", "cat": "instruct", "prompt": "Write a limerick about a programmer who forgets to save their work."}
+{"id": "instruct-010", "cat": "instruct", "prompt": "Give three tips for giving a clear five minute presentation to a non-technical audience."}
+{"id": "instruct-011", "cat": "instruct", "prompt": "Summarize the plot of Romeo and Juliet in exactly four sentences."}
+{"id": "instruct-012", "cat": "instruct", "prompt": "Translate the following sentence into French, Spanish, and German: 'The library closes at eight on weekdays.'"}
+{"id": "instruct-013", "cat": "instruct", "prompt": "Write a short motivational note, under 60 words, for a friend starting their first day at a new job."}
+{"id": "instruct-014", "cat": "instruct", "prompt": "Explain the difference between weather and climate in plain language, then give one example of each."}
+{"id": "instruct-015", "cat": "instruct", "prompt": "Create a simple weekly meal plan for one person with five dinners that share ingredients to reduce waste."}
+{"id": "instruct-016", "cat": "instruct", "prompt": "Give step-by-step instructions to set up a new Git repository locally and push it to a remote for the first time."}
+{"id": "instruct-017", "cat": "instruct", "prompt": "List six questions a person should ask before adopting a dog, and say why each one matters."}
+{"id": "instruct-018", "cat": "instruct", "prompt": "Write a four line poem about the last leaf of autumn, without using the word 'fall'."}
+{"id": "instruct-019", "cat": "instruct", "prompt": "Describe how to brew a good cup of pour-over coffee in five numbered steps."}
+{"id": "instruct-020", "cat": "instruct", "prompt": "Compare electric and gas cars on cost, range, and maintenance in a short table followed by a one sentence recommendation."}

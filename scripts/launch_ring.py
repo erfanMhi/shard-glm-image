@@ -63,14 +63,16 @@ def log(*a):
     print(time.strftime("%H:%M:%S"), *a, flush=True)
 
 # ---------- vast ----------
-def vast_json(args, timeout=120):
-    r = subprocess.run([VASTAI] + args + ["--raw"], capture_output=True, text=True, timeout=timeout)
-    out = r.stdout
-    for cut in ("[", "{"):
-        k = out.find(cut)
-        if k >= 0:
-            try: return json.loads(out[k:])
-            except Exception: pass
+def vast_json(args, timeout=120, tries=3):
+    for i in range(tries):                        # a transient API error must not abort a 3 h study (wait_running raises on a missing id)
+        r = subprocess.run([VASTAI] + args + ["--raw"], capture_output=True, text=True, timeout=timeout)
+        out = r.stdout
+        for cut in ("[", "{"):
+            k = out.find(cut)
+            if k >= 0:
+                try: return json.loads(out[k:])
+                except Exception: pass
+        if i + 1 < tries: log(f"    !! vastai {' '.join(args)} returned no JSON (attempt {i + 1}/{tries}), retrying in 10 s"); time.sleep(10)
     raise RuntimeError(f"vastai {' '.join(args)} returned no JSON: {(out + r.stderr)[-300:]}")
 
 def instances():
@@ -106,11 +108,14 @@ def rssh(inst, cmd, timeout=120):
     return r.returncode, r.stdout, r.stderr
 
 def scp_from(inst, remote_paths, dest):
+    """pull files; returns True when every file arrived (a failed pull is logged, never silent)."""
     os.makedirs(dest, exist_ok=True)
-    port = str(inst["ports"]["22/tcp"][0]["HostPort"])
+    port = str(inst["ports"]["22/tcp"][0]["HostPort"]); ok = True
     for rp in remote_paths:
-        subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [f"root@{inst['public_ipaddr']}:{rp}", dest],
-                       capture_output=True, text=True, timeout=600)
+        r = subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [f"root@{inst['public_ipaddr']}:{rp}", dest],
+                           capture_output=True, text=True, timeout=600)
+        if r.returncode != 0: ok = False; log(f"    !! scp {inst['id']}:{rp} failed rc {r.returncode}: {r.stderr.strip()[-160:]}")
+    return ok
 
 def ep(inst):
     return f"{inst['public_ipaddr']}:{mapped_port(inst)}"
@@ -230,6 +235,7 @@ def main():
     ap.add_argument("--remesh", action="store_true", help="re-measure the RTT mesh even if OUT/mesh_rtt.json exists")
     ap.add_argument("--skip-fetch", action="store_true")
     ap.add_argument("--stage-timeout", type=int, default=2400, help="seconds to wait for a stage to print WARM")
+    ap.add_argument("--wait-timeout", type=int, default=900, help="seconds to wait for every box to be running with :29600 mapped (use ~180 once the ring is up: a box that went offline should fail fast)")
     ap.add_argument("--allow-any-label", action="store_true", help="operate on instances whose label is not erfan-*")
     ap.add_argument("--prompts-file", default=None, help="cgmulti modes: local JSONL of prompts, pushed to the coordinator as /root/prompts.jsonl")
     ap.add_argument("--repeat", type=int, default=1, help="cgmulti modes: passes over the prompt set")
@@ -244,7 +250,7 @@ def main():
     manifest = {"args": vars(a), "K": K, "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
 
     log("[1] instances")
-    nodes = wait_running(ids)
+    nodes = wait_running(ids, a.wait_timeout)
     for n in nodes:
         lbl = n.get("label") or ""
         log(f"    {n['id']} label={lbl!r} {n.get('geolocation')} {n.get('gpu_name')} ip={n['public_ipaddr']} :{mapped_port(n)} ssh:{n['ports']['22/tcp'][0]['HostPort']}")
@@ -318,46 +324,80 @@ def main():
     log(f"[7] stages ({'ring direct-return' if ring else 'relay-back chain'}; trace={a.trace})")
     ensure_stages(chain, coord, ring, a.trace, a.stage_timeout)
 
+    # the coordinator driver is baked into the image; push the checked-out root/glm_swarm_nvfp4_cg.py so a patched driver (or a
+    # box that pulled an older image tag) never runs a stale copy. sha256-verified, 3 attempts, fatal on mismatch.
+    drv = os.path.join(os.path.dirname(HERE), "root", "glm_swarm_nvfp4_cg.py")
+    drv_sha = hashlib.sha256(open(drv, "rb").read()).hexdigest()
+    port = str(coord["ports"]["22/tcp"][0]["HostPort"])
+    for attempt in range(3):
+        subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [drv, f"root@{coord['public_ipaddr']}:/root/glm_swarm_nvfp4_cg.py"], capture_output=True, timeout=120)
+        rc, out, err = rssh(coord, "sha256sum /root/glm_swarm_nvfp4_cg.py 2>/dev/null | cut -d' ' -f1", 60)
+        if out.strip() == drv_sha: break
+        log(f"    !! driver push attempt {attempt + 1}/3: remote sha {out.strip()[:12]!r} != local {drv_sha[:12]}")
+    else:
+        raise RuntimeError("could not push root/glm_swarm_nvfp4_cg.py to the coordinator")
+    log(f"    coordinator driver glm_swarm_nvfp4_cg.py sha {drv_sha[:12]} in place")
     head = ep(chain[0][0])
     results = []
     multi = MODES[a.mode].get("multi")
+    cfg = os.path.basename(os.path.normpath(a.out))               # the study tag names the configuration (plan runs included)
+    n_prompts = 0
     if multi:
         if not a.prompts_file: raise SystemExit(f"--mode {a.mode} needs --prompts-file")
+        n_prompts = sum(1 for l in open(a.prompts_file) if l.strip())
+        want_sha = hashlib.sha256(open(a.prompts_file, "rb").read()).hexdigest()
         port = str(coord["ports"]["22/tcp"][0]["HostPort"])
-        subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [a.prompts_file, f"root@{coord['public_ipaddr']}:/root/prompts.jsonl"], capture_output=True, timeout=120)
-        log(f"    pushed {a.prompts_file} -> coordinator /root/prompts.jsonl")
+        for attempt in range(3):                      # verified push: a silently failed scp would run the PREVIOUS study's prompt file
+            subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [a.prompts_file, f"root@{coord['public_ipaddr']}:/root/prompts.jsonl"], capture_output=True, timeout=120)
+            rc, out, err = rssh(coord, "sha256sum /root/prompts.jsonl 2>/dev/null | cut -d' ' -f1", 60)
+            if out.strip() == want_sha: break
+            log(f"    !! prompts push attempt {attempt + 1}/3: remote sha {out.strip()[:12]!r} != local {want_sha[:12]}")
+        else:
+            raise RuntimeError("could not push the prompts file to the coordinator")
+        log(f"    pushed {a.prompts_file} ({n_prompts} prompts, sha {want_sha[:12]}) -> coordinator /root/prompts.jsonl")
     for i in range(a.runs):
         dump = f"/root/run_{a.mode}_{i}.json" if MODES[a.mode]["dump"] else None
         trace = f"/root/coord_trace_{a.mode}_{i}.jsonl" if a.trace else None
         cmd = coord_cmd(a.mode, head, a.prompt, a.max_new, K, a.depth, dump, a.repeat)
         envp = f"COORD_TRACE={trace} " if trace else ""
-        full = (REAP + f"rm -f {dump or ''} {trace or ''} {'/root/results.jsonl' if multi else ''}; cd /root && {envp}{PY} {cmd} 2>&1")
+        tag = f"d{a.depth}_k{K}{'' if a.mode == 'cgmulti' else '_eager'}_run{i}"
+        keep = f"/root/results_{cfg}_{tag}.jsonl"                 # remote copy survives a failed pull (pull by hand before teardown)
+        full = (REAP + f"rm -f {dump or ''} {trace or ''} {'/root/results.jsonl' if multi else ''}; cd /root && {envp}{PY} {cmd} 2>&1; RC=$?; "
+                + (f"cp -f /root/results.jsonl {keep} 2>/dev/null; " if multi else "") + "exit $RC")
         log(f"[8] run {i}: {cmd}")
         t0 = time.time()
         rc, out, err = rssh(coord, full, 3600)
         dt = time.time() - t0
         open(os.path.join(a.out, f"{a.mode}_run{i}.stdout"), "w").write(out + err)
         r = parse_result(out) | {"run": i, "mode": a.mode, "rc": rc, "wall_s": round(dt), "t_start": t0, "t_end": t0 + dt, "cmd": cmd}
+        if rc != 0:
+            tail = [ln for ln in (out + err).splitlines() if ln.strip()]
+            log(f"    !! coordinator exited rc {rc} after {dt:.0f}s: {tail[-1][-200:] if tail else '(no output)'}")
         if dump or trace:
             scp_from(coord, [p for p in (dump, trace) if p], a.out)
         if multi:
             scp_from(coord, ["/root/results.jsonl"], a.out)
             rp = os.path.join(a.out, "results.jsonl")
-            if os.path.exists(rp):
-                tag = f"d{a.depth}_k{K}{'' if a.mode == 'cgmulti' else '_eager'}_run{i}"
-                cfg = os.path.basename(os.path.normpath(a.out))           # the study tag names the configuration (plan runs included)
+            if not os.path.exists(rp): log(f"    !! no results pulled; remote copy kept at coordinator {keep}")
+            else:
+                toks = []
                 with open(rp) as fi, open(os.path.join(a.out, f"results_{tag}.jsonl"), "w") as fo:
                     for ln in fi:
-                        try: d = json.loads(ln); d.setdefault("config", cfg); d.setdefault("plan", a.plan or ""); fo.write(json.dumps(d) + "\n")
+                        try:
+                            d = json.loads(ln); d.setdefault("config", cfg); d.setdefault("plan", a.plan or ""); fo.write(json.dumps(d) + "\n")
+                            if d.get("tok_s") is not None: toks.append(float(d["tok_s"]))
                         except Exception: fo.write(ln)
                 os.remove(rp); r["results_file"] = f"results_{tag}.jsonl"
                 r["n_results"] = sum(1 for _ in open(os.path.join(a.out, f"results_{tag}.jsonl")))
+                r["n_expected"] = n_prompts * max(1, a.repeat); r["n_ok"] = len(toks)
+                if toks: r["tok_s_last"] = r.get("tok_s"); r["tok_s"] = sorted(toks)[len(toks) // 2]   # the run's number = median over prompts, not the last GENERATED line
+                if r["n_ok"] < r["n_expected"]: log(f"    !! {r['n_ok']} successful generations of {r['n_expected']} expected ({r['n_results']} records; see errors in {r['results_file']})")
         if dump and os.path.exists(os.path.join(a.out, os.path.basename(dump))):
             d = json.load(open(os.path.join(a.out, os.path.basename(dump))))
             sha = hashlib.sha256(json.dumps(d["output_token_ids"]).encode()).hexdigest()
             r["output_sha256"] = sha; r["matches_receipt"] = sha == RECEIPT_SHA; r["n_ids"] = len(d["output_token_ids"])
         results.append(r)
-        log(f"    -> {r.get('summary', 'NO SUMMARY LINE (see stdout file)')}" + (f" | sha {r['output_sha256'][:12]} receipt_match={r['matches_receipt']}" if "output_sha256" in r else "") + (f" | {r.get('n_results', 0)} results -> {r.get('results_file')}" if multi else ""))
+        log(f"    -> {r.get('summary', 'NO SUMMARY LINE (see stdout file)')}" + (f" | sha {r['output_sha256'][:12]} receipt_match={r['matches_receipt']}" if "output_sha256" in r else "") + (f" | {r.get('n_ok', 0)}/{r.get('n_expected', '?')} ok, median {r.get('tok_s', float('nan')):.2f} tok/s -> {r.get('results_file')}" if multi else ""))
         if "time_split" in r: log(f"       {r['time_split']}")
         json.dump(manifest | {"results": results}, open(os.path.join(a.out, "manifest.json"), "w"), indent=1)
 

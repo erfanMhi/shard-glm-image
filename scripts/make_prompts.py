@@ -223,7 +223,7 @@ def validate(rows):
         seen.add(pid)
         assert prompt not in {r[2] for r in rows if r[0] != pid}, f"duplicate prompt {pid}"
         assert prompt.isascii(), f"non-ASCII in {pid}"
-        assert "—" not in prompt, f"em-dash in {pid}"
+        assert "\u2014" not in prompt, f"em-dash in {pid}"
         assert prompt == prompt.rstrip(), f"trailing whitespace in {pid}"
         for line in prompt.split("\n"):
             assert line == line.rstrip(), f"trailing whitespace on a line of {pid}"

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""plan_from_traces.py <run_dir_with_stage_traces> [cap=16] [floor=6]: layers per stage proportional to each box's measured
-speed (median compute ms per layer from STAGE_TRACE), so all stages take about the same time per chunk. Prints the plan."""
+"""plan_from_traces.py <run_dir_with_stage_traces> [cap=15] [floor=6]: layers per stage proportional to each box's measured
+speed (median compute ms per layer from STAGE_TRACE), so all stages take about the same time per chunk. Prints the plan.
+cap: measured 2026-08-26, 13 NVFP4 MoE layers = 75.3 GB allocated (5.79 GB/layer) on a 97887 MiB card with 101.4 GB free at idle:
+15 layers = 86.9 GB (14.5 GB headroom), 16 = 92.7 GB (8.7 GB, untested), 17 = 98.5 GB (will OOM)."""
 import json, glob, os, sys, statistics as st
-R = sys.argv[1]; cap = int(sys.argv[2]) if len(sys.argv) > 2 else 16; floor = int(sys.argv[3]) if len(sys.argv) > 3 else 6; NL = 78
+R = sys.argv[1]; cap = int(sys.argv[2]) if len(sys.argv) > 2 else 15; floor = int(sys.argv[3]) if len(sys.argv) > 3 else 6; NL = 78
 stages = []
 for d in sorted(glob.glob(os.path.join(R, "stage*_*"))):
     f = os.path.join(d, "stage_trace.jsonl")

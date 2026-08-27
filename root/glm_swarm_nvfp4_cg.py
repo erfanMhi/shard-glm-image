@@ -54,12 +54,13 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
     print(f"coord(CG depth={depth} K={K} compile={compile}) -> head {stage_ep}; tail returns on :{ret_port}", flush=True)
     eos = cfg.eos_token_id if isinstance(cfg.eos_token_id, list) else [cfg.eos_token_id]
 
+    outstanding = [0]                             # messages sent to the ring whose response has not been read yet (ring = FIFO, 1 reply per message)
     def send_chunk(start, toks):
-        send_msg(fwd, start, torch.nn.functional.embedding(torch.tensor([toks], device=dev), embed_w))
+        send_msg(fwd, start, torch.nn.functional.embedding(torch.tensor([toks], device=dev), embed_w)); outstanding[0] += 1
     def recv_logits():
         if ret_conn[0] is None:
             ret_conn[0], _ = ret_srv.accept(); ret_conn[0].setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1); ret_conn[0].settimeout(300)
-        _, hb = recv_msg(ret_conn[0])
+        _, hb = recv_msg(ret_conn[0]); outstanding[0] -= 1
         x = hb[0].float(); xn = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + eps) * norm_w
         return (xn.to(torch.bfloat16) @ lm_head_w.t()).float().argmax(-1).tolist()
 
@@ -150,6 +151,9 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
                     discard = len(inflight); tail_tok = cur; send_pos = pos   # rewind: _WRITE_POS (set per dstep) moves the write; patch masks the stale tail
                 if len(out) >= max_new or cur in eos: done = True
         dt = time.time() - t0; ntok = len(out)
+        if prompts_file:                              # multi-prompt: consume the responses of the chunks still in flight (depth-1 of them);
+            with torch.no_grad():                     # otherwise the next prompt reads them as its prefill result. Not timed (dt is final).
+                while outstanding[0] > 0: recv_logits()   # (single-prompt path unchanged: the process exits and the sockets drop them)
         if trace:
             trace.write(json.dumps({"summary": True, "id": pid, "t0": t0, "t_end": t0 + dt, "ntok": ntok, "tok_s": ntok / dt, "depth": depth, "K": K,
                                     "compile": compile, "valid": valid, "stale": wasted, "accepted": accepted,
@@ -165,7 +169,17 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
     last = None
     for rep in range(max(1, repeat)):
         for it in items:
-            R = run_one(it["prompt"], it.get("id", "single")); last = R
+            pid = it.get("id", "single")
+            try:
+                R = run_one(it["prompt"], pid); last = R
+            except Exception as e:                    # record the failure per prompt (partial results stay valid). Go on ONLY when the ring is
+                print(f"\nPROMPT FAILED id {pid}: {type(e).__name__}: {e} (outstanding {outstanding[0]})", flush=True)   # provably clean:
+                if results:                           # a socket error/timeout (OSError) or unread responses would misalign every later prompt.
+                    with open(results, "a") as f:
+                        f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": depth, "K": K, "compile": compile,
+                                            "error": f"{type(e).__name__}: {e}"[:300], "outstanding": outstanding[0]}) + "\n")
+                if isinstance(e, OSError) or outstanding[0] or not prompts_file: raise
+                continue
             if results:
                 import hashlib
                 with open(results, "a") as f:
@@ -173,7 +187,12 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
                                         "ntok": R["ntok"], "seconds": round(R["dt"], 4), "tok_s": round(R["ntok"] / R["dt"], 3),
                                         "valid": R["valid"], "stale": R["wasted"], "accepted": R["accepted"],
                                         "mean_accept": round(R["accepted"] / max(R["valid"], 1), 4), "draft_s": round(R["dt_draft"], 3), "wait_s": round(R["dt_recv"], 3),
-                                        "output_sha": hashlib.sha256(json.dumps(R["ids"] + R["out"]).encode()).hexdigest()}) + "\n")
+                                        "output_sha": hashlib.sha256(json.dumps(R["ids"] + R["out"]).encode()).hexdigest(),
+                                        # the stop rule is chunk-aligned (EOS inside a chunk is passed; out can be max_new+K-1 long), so two
+                                        # correct greedy runs can differ in length: compare on the ids up to the first EOS, capped at max_new
+                                        "eos_at": next((i for i, t in enumerate(R["out"]) if t in eos), None),
+                                        "output_sha_eos": hashlib.sha256(json.dumps(R["ids"] + (R["out"][:next((i for i, t in enumerate(R["out"]) if t in eos), len(R["out"]))])[:max_new]).encode()).hexdigest(),
+                                        "out_ids": R["out"]}) + "\n")
     if dump and last is not None:
         json.dump({"prompt": items[-1]["prompt"], "output_text": tok.decode(last["ids"] + last["out"], skip_special_tokens=True),
                    "output_token_ids": last["ids"] + last["out"], "tok_s_warm": round(last["ntok"] / last["dt"], 2),
