@@ -53,6 +53,10 @@ MODES = {
     "cg":      dict(cls="ring",  cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --compile --prompt {prompt} --max-new {n}", dump=True, K=2),
     "cgeager": dict(cls="ring",  cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --prompt {prompt} --max-new {n}", dump=True, K=2),
     "cgplain": dict(cls="ring",  cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --plain --prompt {prompt} --max-new {n}", dump=True, K=None),
+    # multi-prompt study modes: one coordinator process runs every prompt of /root/prompts.jsonl (draft loaded once) and appends
+    # a JSON line per generation to /root/results.jsonl, pulled into --out afterwards
+    "cgmulti":      dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --compile --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}", dump=False, K=2, multi=True),
+    "cgmulti_eager": dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}", dump=False, K=2, multi=True),
 }
 
 def log(*a):
@@ -191,14 +195,15 @@ def ensure_stages(chain, coord, ring, trace, timeout):
         log(f"  stage{i}: {'WARM in %.0fs' % info if ok else 'FAILED ' + str(info)[-600:]}")
         if not ok: raise RuntimeError(f"stage{i} did not warm")
 
-def coord_cmd(mode, head, prompt, n, K, depth, dump):
+def coord_cmd(mode, head, prompt, n, K, depth, dump, repeat=1):
     m = MODES[mode]
-    cmd = m["cmd"].format(head=head, port=STAGE_PORT, prompt=shlex.quote(prompt), n=n, K=K, depth=depth)
+    cmd = m["cmd"].format(head=head, port=STAGE_PORT, prompt=shlex.quote(prompt), n=n, K=K, depth=depth, repeat=repeat)
     if m["dump"] and dump: cmd += f" --dump {dump}"
     return cmd
 
 def parse_result(stdout):
     r = {}
+    r["n_generated"] = sum(1 for ln in stdout.splitlines() if ln.startswith("GENERATED"))
     for ln in stdout.splitlines():
         if ln.startswith("GENERATED") or ln.startswith("PLAIN GREEDY"):
             r["summary"] = ln.strip()
@@ -226,6 +231,9 @@ def main():
     ap.add_argument("--skip-fetch", action="store_true")
     ap.add_argument("--stage-timeout", type=int, default=2400, help="seconds to wait for a stage to print WARM")
     ap.add_argument("--allow-any-label", action="store_true", help="operate on instances whose label is not erfan-*")
+    ap.add_argument("--prompts-file", default=None, help="cgmulti modes: local JSONL of prompts, pushed to the coordinator as /root/prompts.jsonl")
+    ap.add_argument("--repeat", type=int, default=1, help="cgmulti modes: passes over the prompt set")
+    ap.add_argument("--plan", default="", help="explicit layers per stage in ring order, e.g. 10,15,16,14,14,9 (sums to 78); default: equal blocks")
     ap.add_argument("--auto-coord", action="store_true", help="after the RTT mesh, pick the coordinator that minimizes the loop cost (overrides --coord-id)")
     ap.add_argument("--mesh-only", action="store_true", help="measure the mesh, print the ring choice, write manifest, and exit")
     a = ap.parse_args()
@@ -267,7 +275,15 @@ def main():
             log(f"    -> coordinator {a.coord_id} ({coord.get('geolocation')})")
         order, cost = LS.solve_order(rtt, ids.index(a.coord_id))
         log(f"    loop cost {cost:.1f} ms; stage order: {[nodes[i]['id'] for i in order]} ({[nodes[i].get('geolocation') for i in order]})")
-    chain = LS.assign_layers(order, nodes, NLAYERS)
+    if a.plan:
+        counts = [int(x) for x in a.plan.split(",")]
+        if len(counts) != len(order) or sum(counts) != NLAYERS: raise SystemExit(f"--plan must have {len(order)} entries summing to {NLAYERS}")
+        blocks, cur = [], 0
+        for c in counts: blocks.append(list(range(cur, cur + c))); cur += c
+        chain = [(nodes[order[i]], blocks[i]) for i in range(len(order))]
+        log(f"    explicit plan {counts}")
+    else:
+        chain = LS.assign_layers(order, nodes, NLAYERS)
     manifest["ring"] = [{"id": inst["id"], "geo": inst.get("geolocation"), "layers": [blk[0], blk[-1]], "ep": ep(inst)} for inst, blk in chain]
     manifest["loop_cost_ms"] = cost
     for i, (inst, blk) in enumerate(chain): log(f"    stage{i}: {inst['id']} ({inst.get('geolocation')}) layers {blk[0]}-{blk[-1]}")
@@ -304,12 +320,18 @@ def main():
 
     head = ep(chain[0][0])
     results = []
+    multi = MODES[a.mode].get("multi")
+    if multi:
+        if not a.prompts_file: raise SystemExit(f"--mode {a.mode} needs --prompts-file")
+        port = str(coord["ports"]["22/tcp"][0]["HostPort"])
+        subprocess.run(["scp", "-i", KEY, "-P", port] + LS.SSHO + [a.prompts_file, f"root@{coord['public_ipaddr']}:/root/prompts.jsonl"], capture_output=True, timeout=120)
+        log(f"    pushed {a.prompts_file} -> coordinator /root/prompts.jsonl")
     for i in range(a.runs):
         dump = f"/root/run_{a.mode}_{i}.json" if MODES[a.mode]["dump"] else None
         trace = f"/root/coord_trace_{a.mode}_{i}.jsonl" if a.trace else None
-        cmd = coord_cmd(a.mode, head, a.prompt, a.max_new, K, a.depth, dump)
+        cmd = coord_cmd(a.mode, head, a.prompt, a.max_new, K, a.depth, dump, a.repeat)
         envp = f"COORD_TRACE={trace} " if trace else ""
-        full = (REAP + f"rm -f {dump or ''} {trace or ''}; cd /root && {envp}{PY} {cmd} 2>&1")
+        full = (REAP + f"rm -f {dump or ''} {trace or ''} {'/root/results.jsonl' if multi else ''}; cd /root && {envp}{PY} {cmd} 2>&1")
         log(f"[8] run {i}: {cmd}")
         t0 = time.time()
         rc, out, err = rssh(coord, full, 3600)
@@ -318,12 +340,24 @@ def main():
         r = parse_result(out) | {"run": i, "mode": a.mode, "rc": rc, "wall_s": round(dt), "t_start": t0, "t_end": t0 + dt, "cmd": cmd}
         if dump or trace:
             scp_from(coord, [p for p in (dump, trace) if p], a.out)
+        if multi:
+            scp_from(coord, ["/root/results.jsonl"], a.out)
+            rp = os.path.join(a.out, "results.jsonl")
+            if os.path.exists(rp):
+                tag = f"d{a.depth}_k{K}{'' if a.mode == 'cgmulti' else '_eager'}_run{i}"
+                cfg = os.path.basename(os.path.normpath(a.out))           # the study tag names the configuration (plan runs included)
+                with open(rp) as fi, open(os.path.join(a.out, f"results_{tag}.jsonl"), "w") as fo:
+                    for ln in fi:
+                        try: d = json.loads(ln); d.setdefault("config", cfg); d.setdefault("plan", a.plan or ""); fo.write(json.dumps(d) + "\n")
+                        except Exception: fo.write(ln)
+                os.remove(rp); r["results_file"] = f"results_{tag}.jsonl"
+                r["n_results"] = sum(1 for _ in open(os.path.join(a.out, f"results_{tag}.jsonl")))
         if dump and os.path.exists(os.path.join(a.out, os.path.basename(dump))):
             d = json.load(open(os.path.join(a.out, os.path.basename(dump))))
             sha = hashlib.sha256(json.dumps(d["output_token_ids"]).encode()).hexdigest()
             r["output_sha256"] = sha; r["matches_receipt"] = sha == RECEIPT_SHA; r["n_ids"] = len(d["output_token_ids"])
         results.append(r)
-        log(f"    -> {r.get('summary', 'NO SUMMARY LINE (see stdout file)')}" + (f" | sha {r['output_sha256'][:12]} receipt_match={r['matches_receipt']}" if "output_sha256" in r else ""))
+        log(f"    -> {r.get('summary', 'NO SUMMARY LINE (see stdout file)')}" + (f" | sha {r['output_sha256'][:12]} receipt_match={r['matches_receipt']}" if "output_sha256" in r else "") + (f" | {r.get('n_results', 0)} results -> {r.get('results_file')}" if multi else ""))
         if "time_split" in r: log(f"       {r['time_split']}")
         json.dump(manifest | {"results": results}, open(os.path.join(a.out, "manifest.json"), "w"), indent=1)
 

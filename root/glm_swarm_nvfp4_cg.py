@@ -40,7 +40,7 @@ def cg_causal_mask(config, inputs_embeds, attention_mask, past_key_values, posit
     return torch.where(allow, torch.zeros((), dtype=dtype, device=d), torch.full((), neg, dtype=dtype, device=d))[None, None]
 G.create_causal_mask = cg_causal_mask
 
-def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=None, plain=False):
+def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=None, plain=False, prompts_file=None, results=None, repeat=1):
     global _MAXLEN, _WRITE_POS
     _WRITE_POS = torch.zeros((), dtype=torch.long, device=dev)
     tok = AutoTokenizer.from_pretrained(KV.DIR, trust_remote_code=True)
@@ -63,7 +63,14 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
         x = hb[0].float(); xn = x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + eps) * norm_w
         return (xn.to(torch.bfloat16) @ lm_head_w.t()).float().argmax(-1).tolist()
 
-    ids = tok(prompt, return_tensors="pt").input_ids[0].tolist(); L = len(ids)
+
+    # --prompts-file: run every prompt (JSONL: {"id","cat","prompt"}) in ONE process, draft loaded and compiled once; each prompt
+    # resets the stages (start_pos 0) and re-prefills the draft exactly as the single-prompt path does. --results appends one
+    # JSON line per generation. Without --prompts-file the behaviour is the original single-prompt run.
+    items = [{"id": "single", "cat": "", "prompt": prompt}]
+    if prompts_file:
+        items = [json.loads(l) for l in open(prompts_file) if l.strip()]
+    ids = tok(items[0]["prompt"], return_tensors="pt").input_ids[0].tolist(); L = len(ids)
     if plain:                                     # REFERENCE: pure 1-token greedy over the ring — no draft, no spec, no cudagraph
         t0 = time.time(); send_chunk(0, ids); r = recv_logits(); cur = r[-1]; out = [cur]; pos = L
         with torch.no_grad():
@@ -82,7 +89,8 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
     draft = AutoModelForCausalLM.from_pretrained(DRAFT, dtype=torch.bfloat16, trust_remote_code=True).to(dev).eval()
     print(f"draft loaded ({torch.cuda.memory_allocated()/1e9:.1f} GB)", flush=True)
     DVOCAB = draft.config.vocab_size
-    _MAXLEN = max(2048, L + 4 * max_new + depth * K + 256)
+    Lmax = max(len(tok(it["prompt"], return_tensors="pt").input_ids[0]) for it in items)
+    _MAXLEN = max(2048, Lmax + 4 * max_new + depth * K + 256)
     dcache = StaticCache(config=draft.config, max_cache_len=_MAXLEN, device=dev, dtype=torch.bfloat16)
     step = torch.compile(draft, mode="reduce-overhead", fullgraph=False) if compile else draft
     _inp = torch.zeros((1, 1), dtype=torch.long, device=dev); _cp = torch.zeros((1,), dtype=torch.long, device=dev)
@@ -92,69 +100,86 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
         _cp[0] = position; _pid[0, 0] = position; _WRITE_POS.fill_(position)   # _WRITE_POS drives the cache write slot
         if compile: torch.compiler.cudagraph_mark_step_begin()   # else cudagraph-trees reuses buffers across calls -> corrupt drafts
         return int(step(input_ids=_inp, position_ids=_pid, past_key_values=dcache, cache_position=_cp, use_cache=True).logits[0, -1].argmax())
-    with torch.no_grad():
-        send_chunk(0, ids); r = recv_logits(); cur = r[-1]
-        _WRITE_POS.fill_(0)                                       # prefill writes [0..L-1]
-        draft(input_ids=torch.tensor([[min(t, DVOCAB - 1) for t in ids]], device=dev), past_key_values=dcache,
-              cache_position=torch.arange(L, device=dev), position_ids=torch.arange(L, device=dev)[None], use_cache=True)
-        if compile:
-            for w in range(8): dstep(cur, L + w)
-    out = [cur]; pos = L; inflight = []; discard = 0; send_pos = pos; tail_tok = cur
-    valid = 0; accepted = 0; wasted = 0; dt_draft = 0.0; dt_recv = 0.0
-    trace = open(os.environ["COORD_TRACE"], "a") if os.environ.get("COORD_TRACE") else None   # one JSON line per chunk
-    tr_q = []                                     # trace records of in-flight chunks, parallel to `inflight`
-    def draft_k():
-        nonlocal tail_tok
-        ds = []; t = tail_tok; p = send_pos
-        for _ in range(K):
-            t = dstep(t, p); ds.append(t); p += 1
-        return ds
-    t0 = time.time()
-    with torch.no_grad():
-        done = False
-        while not done:
-            while len(inflight) < depth and not done:
-                _td = time.time(); ds = draft_k(); _td1 = time.time(); dt_draft += _td1 - _td
-                send_chunk(send_pos, [tail_tok] + ds)
-                if trace: tr_q.append({"send_pos": send_pos, "K": K, "t_draft0": _td, "t_draft1": _td1, "t_send": time.time()})
-                inflight.append((send_pos, ds)); tail_tok = ds[-1]; send_pos += K
-            _tr = time.time(); r = recv_logits(); _tr1 = time.time(); dt_recv += _tr1 - _tr
-            sp, ds = inflight.pop(0)
-            rec = tr_q.pop(0) if trace else None
-            if rec: rec["t_wait0"] = _tr; rec["t_recv"] = _tr1
-            if discard > 0:
-                discard -= 1; wasted += 1
-                if rec: rec["verdict"] = "stale"; trace.write(json.dumps(rec) + "\n")
-                continue
-            n = 0
-            for j in range(K):
-                if ds[j] == r[j]: n += 1
-                else: break
-            valid += 1; accepted += n
-            if rec: rec["verdict"] = "full" if n == K else f"diverge_{n}"; trace.write(json.dumps(rec) + "\n")
-            if n == K:
-                out.extend(ds); pos += K; cur = ds[-1]
-            else:
-                out.extend(ds[:n] + [r[n]]); cur = r[n]; pos += n + 1
-                discard = len(inflight); tail_tok = cur; send_pos = pos   # rewind: _WRITE_POS (set per dstep) moves the write; patch masks the stale tail
-            if len(out) >= max_new or cur in eos: done = True
-    dt = time.time() - t0; ntok = len(out)
-    if trace:
-        trace.write(json.dumps({"summary": True, "t0": t0, "t_end": t0 + dt, "ntok": ntok, "tok_s": ntok / dt, "depth": depth, "K": K,
-                                "compile": compile, "valid": valid, "stale": wasted, "accepted": accepted,
-                                "dt_draft": dt_draft, "dt_recv": dt_recv}) + "\n"); trace.close()
-    if cur in eos and out and out[-1] in eos: out = out[:-1]
-    print(f"\nGENERATED {ntok} tokens in {dt:.1f}s = {ntok/dt:.2f} tok/s | depth {depth} K {K} compile={compile} | "
-          f"{valid} valid (+{wasted} stale) | mean accept {accepted/max(valid,1):.2f} | "
-          f"{(accepted+valid)/max(valid,1):.2f} tok/valid-traversal", flush=True)
-    print(f"  time split: draft {dt_draft:.1f}s ({dt_draft/dt:.0%}) | recv-wait {dt_recv:.1f}s ({dt_recv/dt:.0%})", flush=True)
-    print("decoded:", repr(tok.decode(ids + out, skip_special_tokens=True)[:600]), flush=True)
-    if dump:
-        json.dump({"prompt": prompt, "output_text": tok.decode(ids + out, skip_special_tokens=True),
-                   "output_token_ids": ids + out, "tok_s_warm": round(ntok / dt, 2),
+
+    def run_one(prompt, pid="single"):
+        ids = tok(prompt, return_tensors="pt").input_ids[0].tolist(); L = len(ids)
+        with torch.no_grad():
+            send_chunk(0, ids); r = recv_logits(); cur = r[-1]          # start_pos 0 resets every stage's KV cache
+            _WRITE_POS.fill_(0)                                       # prefill writes [0..L-1]
+            draft(input_ids=torch.tensor([[min(t, DVOCAB - 1) for t in ids]], device=dev), past_key_values=dcache,
+                  cache_position=torch.arange(L, device=dev), position_ids=torch.arange(L, device=dev)[None], use_cache=True)
+            if compile:
+                for w in range(8): dstep(cur, L + w)
+        out = [cur]; pos = L; inflight = []; discard = 0; send_pos = pos; tail_tok = cur
+        valid = 0; accepted = 0; wasted = 0; dt_draft = 0.0; dt_recv = 0.0
+        trace = open(os.environ["COORD_TRACE"], "a") if os.environ.get("COORD_TRACE") else None   # one JSON line per chunk
+        tr_q = []                                     # trace records of in-flight chunks, parallel to `inflight`
+        def draft_k():
+            nonlocal tail_tok
+            ds = []; t = tail_tok; p = send_pos
+            for _ in range(K):
+                t = dstep(t, p); ds.append(t); p += 1
+            return ds
+        t0 = time.time()
+        with torch.no_grad():
+            done = False
+            while not done:
+                while len(inflight) < depth and not done:
+                    _td = time.time(); ds = draft_k(); _td1 = time.time(); dt_draft += _td1 - _td
+                    send_chunk(send_pos, [tail_tok] + ds)
+                    if trace: tr_q.append({"id": pid, "send_pos": send_pos, "K": K, "t_draft0": _td, "t_draft1": _td1, "t_send": time.time()})
+                    inflight.append((send_pos, ds)); tail_tok = ds[-1]; send_pos += K
+                _tr = time.time(); r = recv_logits(); _tr1 = time.time(); dt_recv += _tr1 - _tr
+                sp, ds = inflight.pop(0)
+                rec = tr_q.pop(0) if trace else None
+                if rec: rec["t_wait0"] = _tr; rec["t_recv"] = _tr1
+                if discard > 0:
+                    discard -= 1; wasted += 1
+                    if rec: rec["verdict"] = "stale"; trace.write(json.dumps(rec) + "\n")
+                    continue
+                n = 0
+                for j in range(K):
+                    if ds[j] == r[j]: n += 1
+                    else: break
+                valid += 1; accepted += n
+                if rec: rec["verdict"] = "full" if n == K else f"diverge_{n}"; trace.write(json.dumps(rec) + "\n")
+                if n == K:
+                    out.extend(ds); pos += K; cur = ds[-1]
+                else:
+                    out.extend(ds[:n] + [r[n]]); cur = r[n]; pos += n + 1
+                    discard = len(inflight); tail_tok = cur; send_pos = pos   # rewind: _WRITE_POS (set per dstep) moves the write; patch masks the stale tail
+                if len(out) >= max_new or cur in eos: done = True
+        dt = time.time() - t0; ntok = len(out)
+        if trace:
+            trace.write(json.dumps({"summary": True, "id": pid, "t0": t0, "t_end": t0 + dt, "ntok": ntok, "tok_s": ntok / dt, "depth": depth, "K": K,
+                                    "compile": compile, "valid": valid, "stale": wasted, "accepted": accepted,
+                                    "dt_draft": dt_draft, "dt_recv": dt_recv}) + "\n"); trace.close()
+        if cur in eos and out and out[-1] in eos: out = out[:-1]
+        print(f"\nGENERATED {ntok} tokens in {dt:.1f}s = {ntok/dt:.2f} tok/s | depth {depth} K {K} compile={compile} | "
+              f"{valid} valid (+{wasted} stale) | mean accept {accepted/max(valid,1):.2f} | "
+              f"{(accepted+valid)/max(valid,1):.2f} tok/valid-traversal" + (f" | id {pid}" if pid != "single" else ""), flush=True)
+        print(f"  time split: draft {dt_draft:.1f}s ({dt_draft/dt:.0%}) | recv-wait {dt_recv:.1f}s ({dt_recv/dt:.0%})", flush=True)
+        print("decoded:", repr(tok.decode(ids + out, skip_special_tokens=True)[:600]), flush=True)
+        return dict(ids=ids, out=out, ntok=ntok, dt=dt, valid=valid, wasted=wasted, accepted=accepted, dt_draft=dt_draft, dt_recv=dt_recv)
+
+    last = None
+    for rep in range(max(1, repeat)):
+        for it in items:
+            R = run_one(it["prompt"], it.get("id", "single")); last = R
+            if results:
+                import hashlib
+                with open(results, "a") as f:
+                    f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": depth, "K": K, "compile": compile,
+                                        "ntok": R["ntok"], "seconds": round(R["dt"], 4), "tok_s": round(R["ntok"] / R["dt"], 3),
+                                        "valid": R["valid"], "stale": R["wasted"], "accepted": R["accepted"],
+                                        "mean_accept": round(R["accepted"] / max(R["valid"], 1), 4), "draft_s": round(R["dt_draft"], 3), "wait_s": round(R["dt_recv"], 3),
+                                        "output_sha": hashlib.sha256(json.dumps(R["ids"] + R["out"]).encode()).hexdigest()}) + "\n")
+    if dump and last is not None:
+        json.dump({"prompt": items[-1]["prompt"], "output_text": tok.decode(last["ids"] + last["out"], skip_special_tokens=True),
+                   "output_token_ids": last["ids"] + last["out"], "tok_s_warm": round(last["ntok"] / last["dt"], 2),
                    "reference_source": "plain greedy KV decode (glm_swarm_nvfp4_kv.py)"}, open(dump, "w"))
         print(f"dumped run -> {dump}", flush=True)
-    return ntok / dt
+    return last["ntok"] / last["dt"] if last else 0.0
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="role", required=True)
@@ -163,4 +188,7 @@ if __name__ == "__main__":
     p.add_argument("--K", type=int, default=2); p.add_argument("--ret-port", type=int, default=29600)
     p.add_argument("--depth", type=int, default=6); p.add_argument("--compile", action="store_true")
     p.add_argument("--dump", default=None); p.add_argument("--plain", action="store_true")
-    a = ap.parse_args(); coord(a.stage, a.prompt, a.max_new, a.K, a.ret_port, a.depth, a.compile, a.dump, a.plain)
+    p.add_argument("--prompts-file", default=None, help="JSONL of {id, cat, prompt}: run them all in this process")
+    p.add_argument("--results", default=None, help="append one JSON line per generation here")
+    p.add_argument("--repeat", type=int, default=1, help="passes over the prompt set")
+    a = ap.parse_args(); coord(a.stage, a.prompt, a.max_new, a.K, a.ret_port, a.depth, a.compile, a.dump, a.plain, a.prompts_file, a.results, a.repeat)
