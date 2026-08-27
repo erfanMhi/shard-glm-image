@@ -40,7 +40,10 @@ def cg_causal_mask(config, inputs_embeds, attention_mask, past_key_values, posit
     return torch.where(allow, torch.zeros((), dtype=dtype, device=d), torch.full((), neg, dtype=dtype, device=d))[None, None]
 G.create_causal_mask = cg_causal_mask
 
-def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=None, plain=False, prompts_file=None, results=None, repeat=1):
+def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=None, plain=False, prompts_file=None, results=None, repeat=1, configs=None):
+    # configs="6:2,8:2,12:2": with --prompts-file, every prompt runs under every (depth, K) back to back in a rotating order, so a slow
+    # minute on the WAN hits all configurations alike instead of aliasing with one of them (interleaved design)
+    cfgs = [(depth, K)] if not configs else [tuple(int(x) for x in c.split(":")) for c in configs.split(",")]
     global _MAXLEN, _WRITE_POS
     _WRITE_POS = torch.zeros((), dtype=torch.long, device=dev)
     tok = AutoTokenizer.from_pretrained(KV.DIR, trust_remote_code=True)
@@ -91,7 +94,7 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
     print(f"draft loaded ({torch.cuda.memory_allocated()/1e9:.1f} GB)", flush=True)
     DVOCAB = draft.config.vocab_size
     Lmax = max(len(tok(it["prompt"], return_tensors="pt").input_ids[0]) for it in items)
-    _MAXLEN = max(2048, Lmax + 4 * max_new + depth * K + 256)
+    _MAXLEN = max(2048, Lmax + 4 * max_new + max(d_ * k_ for d_, k_ in cfgs) + 256)
     dcache = StaticCache(config=draft.config, max_cache_len=_MAXLEN, device=dev, dtype=torch.bfloat16)
     step = torch.compile(draft, mode="reduce-overhead", fullgraph=False) if compile else draft
     _inp = torch.zeros((1, 1), dtype=torch.long, device=dev); _cp = torch.zeros((1,), dtype=torch.long, device=dev)
@@ -102,7 +105,7 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
         if compile: torch.compiler.cudagraph_mark_step_begin()   # else cudagraph-trees reuses buffers across calls -> corrupt drafts
         return int(step(input_ids=_inp, position_ids=_pid, past_key_values=dcache, cache_position=_cp, use_cache=True).logits[0, -1].argmax())
 
-    def run_one(prompt, pid="single"):
+    def run_one(prompt, pid="single", depth=depth, K=K):
         ids = tok(prompt, return_tensors="pt").input_ids[0].tolist(); L = len(ids)
         with torch.no_grad():
             send_chunk(0, ids); r = recv_logits(); cur = r[-1]          # start_pos 0 resets every stage's KV cache
@@ -112,7 +115,7 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
             if compile:
                 for w in range(8): dstep(cur, L + w)
         out = [cur]; pos = L; inflight = []; discard = 0; send_pos = pos; tail_tok = cur
-        valid = 0; accepted = 0; wasted = 0; dt_draft = 0.0; dt_recv = 0.0
+        valid = 0; accepted = 0; wasted = 0; dt_draft = 0.0; dt_recv = 0.0; t_first = None; n_full = 0
         trace = open(os.environ["COORD_TRACE"], "a") if os.environ.get("COORD_TRACE") else None   # one JSON line per chunk
         tr_q = []                                     # trace records of in-flight chunks, parallel to `inflight`
         def draft_k():
@@ -131,6 +134,7 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
                     if trace: tr_q.append({"id": pid, "send_pos": send_pos, "K": K, "t_draft0": _td, "t_draft1": _td1, "t_send": time.time()})
                     inflight.append((send_pos, ds)); tail_tok = ds[-1]; send_pos += K
                 _tr = time.time(); r = recv_logits(); _tr1 = time.time(); dt_recv += _tr1 - _tr
+                if t_first is None: t_first = _tr1          # first verified chunk back: the pipe is filled from here on
                 sp, ds = inflight.pop(0)
                 rec = tr_q.pop(0) if trace else None
                 if rec: rec["t_wait0"] = _tr; rec["t_recv"] = _tr1
@@ -145,7 +149,7 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
                 valid += 1; accepted += n
                 if rec: rec["verdict"] = "full" if n == K else f"diverge_{n}"; trace.write(json.dumps(rec) + "\n")
                 if n == K:
-                    out.extend(ds); pos += K; cur = ds[-1]
+                    n_full += 1; out.extend(ds); pos += K; cur = ds[-1]
                 else:
                     out.extend(ds[:n] + [r[n]]); cur = r[n]; pos += n + 1
                     discard = len(inflight); tail_tok = cur; send_pos = pos   # rewind: _WRITE_POS (set per dstep) moves the write; patch masks the stale tail
@@ -164,27 +168,33 @@ def coord(stage_ep, prompt, max_new, K, ret_port, depth, compile=False, dump=Non
               f"{(accepted+valid)/max(valid,1):.2f} tok/valid-traversal" + (f" | id {pid}" if pid != "single" else ""), flush=True)
         print(f"  time split: draft {dt_draft:.1f}s ({dt_draft/dt:.0%}) | recv-wait {dt_recv:.1f}s ({dt_recv/dt:.0%})", flush=True)
         print("decoded:", repr(tok.decode(ids + out, skip_special_tokens=True)[:600]), flush=True)
-        return dict(ids=ids, out=out, ntok=ntok, dt=dt, valid=valid, wasted=wasted, accepted=accepted, dt_draft=dt_draft, dt_recv=dt_recv)
+        return dict(ids=ids, out=out, ntok=ntok, dt=dt, valid=valid, wasted=wasted, accepted=accepted, dt_draft=dt_draft, dt_recv=dt_recv,
+                    t0=t0, t_first=t_first if t_first is not None else t0 + dt, n_full=n_full, eos_hit=bool(cur in eos), depth=depth, K=K)
 
     last = None
     for rep in range(max(1, repeat)):
-        for it in items:
+      for i_it, it in enumerate(items):
+        j = (i_it + rep) % len(cfgs); rot = cfgs[j:] + cfgs[:j]     # every configuration takes every slot of the rotation over the pass
+        for (d_, k_) in rot:
             pid = it.get("id", "single")
             try:
-                R = run_one(it["prompt"], pid); last = R
+                R = run_one(it["prompt"], pid, d_, k_); last = R
             except Exception as e:                    # record the failure per prompt (partial results stay valid). Go on ONLY when the ring is
                 print(f"\nPROMPT FAILED id {pid}: {type(e).__name__}: {e} (outstanding {outstanding[0]})", flush=True)   # provably clean:
                 if results:                           # a socket error/timeout (OSError) or unread responses would misalign every later prompt.
                     with open(results, "a") as f:
-                        f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": depth, "K": K, "compile": compile,
+                        f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": d_, "K": k_, "compile": compile,
                                             "error": f"{type(e).__name__}: {e}"[:300], "outstanding": outstanding[0]}) + "\n")
                 if isinstance(e, OSError) or outstanding[0] or not prompts_file: raise
                 continue
             if results:
                 import hashlib
                 with open(results, "a") as f:
-                    f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": depth, "K": K, "compile": compile,
+                    f.write(json.dumps({"id": it.get("id"), "cat": it.get("cat", ""), "rep": rep, "depth": d_, "K": k_, "compile": compile,
                                         "ntok": R["ntok"], "seconds": round(R["dt"], 4), "tok_s": round(R["ntok"] / R["dt"], 3),
+                                        "t0": round(R["t0"], 3), "t_first_s": round(R["t_first"] - R["t0"], 4),
+                                        "tok_s_ss": round(max(0, R["ntok"] - 1 - k_) / max(1e-6, R["dt"] - (R["t_first"] - R["t0"])), 3),   # after the first reply: fill and cold windows excluded
+                                        "n_div": R["valid"] - R["n_full"], "eos_hit": R["eos_hit"], "prompt_len": len(R["ids"]),
                                         "valid": R["valid"], "stale": R["wasted"], "accepted": R["accepted"],
                                         "mean_accept": round(R["accepted"] / max(R["valid"], 1), 4), "draft_s": round(R["dt_draft"], 3), "wait_s": round(R["dt_recv"], 3),
                                         "output_sha": hashlib.sha256(json.dumps(R["ids"] + R["out"]).encode()).hexdigest(),
@@ -210,4 +220,5 @@ if __name__ == "__main__":
     p.add_argument("--prompts-file", default=None, help="JSONL of {id, cat, prompt}: run them all in this process")
     p.add_argument("--results", default=None, help="append one JSON line per generation here")
     p.add_argument("--repeat", type=int, default=1, help="passes over the prompt set")
-    a = ap.parse_args(); coord(a.stage, a.prompt, a.max_new, a.K, a.ret_port, a.depth, a.compile, a.dump, a.plain, a.prompts_file, a.results, a.repeat)
+    p.add_argument("--configs", default=None, help="interleave these depth:K configurations per prompt, e.g. 6:2,8:2,12:2 (needs --prompts-file)")
+    a = ap.parse_args(); coord(a.stage, a.prompt, a.max_new, a.K, a.ret_port, a.depth, a.compile, a.dump, a.plain, a.prompts_file, a.results, a.repeat, a.configs)

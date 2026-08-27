@@ -6,7 +6,7 @@
 set -uo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); IMG=$(dirname "$HERE"); V=$HOME/.vastcli/bin/vastai
 STAMP=$(date +%Y%m%d-%H%M); RUNS=${RUNS:-$IMG/runs/study-$STAMP}; mkdir -p "$RUNS"; export RING_IDS=$RUNS/ring_ids.txt
-CAP_S=${CAP_S:-14400}; T0=$(date +%s); N=${N:-7}; SPARE=${SPARE:-1}; MAXNEW=${MAXNEW:-96}
+CAP_S=${CAP_S:-18000}; T0=$(date +%s); N=${N:-7}; SPARE=${SPARE:-1}; MAXNEW=${MAXNEW:-96}
 PROMPTS=${PROMPTS:-$IMG/prompts/study100.jsonl}
 log() { echo "[$(date '+%H:%M:%S') +$(( ($(date +%s)-T0)/60 ))m] $*"; }
 command -v caffeinate >/dev/null && { caffeinate -is -w $$ & }   # no idle/system sleep while the study runs (a laptop lid must still stay open)
@@ -17,7 +17,10 @@ DEADMAN_S=${DEADMAN_S:-$((CAP_S + 1800))}
   echo "[$(date '+%H:%M:%S')] deadman: ${DEADMAN_S}s since start, destroying every erfan-glm-* box"; bash "$HERE/ring_down.sh" ) >> "$RUNS/deadman.log" 2>&1 &
 DEADMAN=$!; log "deadman pid $DEADMAN fires at +$((DEADMAN_S/60)) min (log: $RUNS/deadman.log)"
 teardown() { bash "$HERE/ring_down.sh" 2>&1 | sed 's/^/    /'; log "DESTROYED"; kill "$DEADMAN" 2>/dev/null; }
-stats() { log "STATS"; ls "$RUNS"/*/results_*.jsonl >/dev/null 2>&1 && python3 "$HERE/study_stats.py" $(ls "$RUNS"/*/results_*.jsonl) --baseline d6_k2 --out "$RUNS/REPORT.md" --csv "$RUNS/summary.csv" 2>&1 | head -60
+stats() { log "STATS"
+  M=$(ls "$RUNS"/main_*/results_*.jsonl "$RUNS"/eager/results_*.jsonl 2>/dev/null); [ -n "$M" ] && python3 "$HERE/study_stats.py" $M --baseline d6_k2 --out "$RUNS/REPORT.md" --csv "$RUNS/summary.csv" 2>&1 | head -40
+  L=$(ls "$RUNS"/long_*/results_*.jsonl 2>/dev/null); [ -n "$L" ] && python3 "$HERE/study_stats.py" $L --baseline long:d6_k2 --out "$RUNS/REPORT_long.md" --csv "$RUNS/summary_long.csv" 2>&1 | head -5
+  J=$(ls "$RUNS"/jitter/results_*.jsonl "$RUNS"/plan/results_*.jsonl "$RUNS"/ctl/results_*.jsonl 2>/dev/null); [ -n "$J" ] && python3 "$HERE/study_stats.py" $J --baseline jitter:d12_k2 --out "$RUNS/REPORT_plan.md" 2>&1 | head -5
   for t in trace_d6 plan_trace_d12; do [ -d "$RUNS/$t" ] && python3 "$HERE/analyze_trace.py" "$RUNS/$t" > "$RUNS/$t/ANALYSIS.txt" 2>&1; done; return 0; }
 fail() { log "FAILED $*"; if [ -n "${FAIL_TEARDOWN:-}" ]; then teardown; else log "ring LEFT UP for inspection (deadman still destroys it at +$((DEADMAN_S/60)) min); run scripts/ring_down.sh when done"; fi; exit 1; }
 trap 'fail signal' INT TERM
@@ -34,6 +37,13 @@ STUDY() { # STUDY <tag> <mode> <depth> <K> <prompts> <repeat> [extra launch_ring
 python3 - "$PROMPTS" "$RUNS" <<'PY'
 import json, sys, collections
 P = [json.loads(l) for l in open(sys.argv[1]) if l.strip()]; R = sys.argv[2]
+bycat = collections.defaultdict(list)
+for p in P: bycat[p["cat"]].append(p)
+import random
+rest = P[1:]; random.Random(20260827).shuffle(rest); P = [P[0]] + rest       # fixed shuffle: categories spread over time, receipt prompt first
+open(f"{R}/prompts100.jsonl", "w").write("".join(json.dumps(p) + "\n" for p in P))
+open(f"{R}/prompts_a.jsonl", "w").write("".join(json.dumps(p) + "\n" for p in P[:51]))   # two halves = two time blocks of the same design
+open(f"{R}/prompts_b.jsonl", "w").write("".join(json.dumps(p) + "\n" for p in P[51:]))
 bycat = collections.defaultdict(list)
 for p in P: bycat[p["cat"]].append(p)
 sub20 = [p for c in sorted(bycat) for p in bycat[c][:5]]
@@ -94,16 +104,31 @@ print("n =", len(rows), "ok =", sum(1 for r in rows if "tok_s" in r), "errors ="
 sys.exit(0 if len(r0) == 2 and all(str(r.get("output_sha", "")).startswith("d9e61275084cb2bf") for r in r0.values()) else 1)
 PY
 
-for d in 6 8 10 12 14; do STUDY "d${d}_k2" cgmulti $d 2 "$PROMPTS" 1 --skip-fetch || log "d${d}_k2 failed (continuing)"; done
-STUDY d6_k2_eager cgmulti_eager 6 2 "$PROMPTS" 1 --skip-fetch || log "eager reference failed (continuing)"
-for k in 3 4; do STUDY "d8_k${k}" cgmulti 8 $k "$PROMPTS" 1 --skip-fetch || log "d8_k${k} failed (continuing)"; done
-STUDY jitter_d6 cgmulti 6 2 "$RUNS/prompts20.jsonl" 3 --skip-fetch || log "jitter d6 failed"
-STUDY jitter_d12 cgmulti 12 2 "$RUNS/prompts20.jsonl" 3 --skip-fetch || log "jitter d12 failed"
+# ---- main study: every prompt runs all seven (depth, K) configurations back to back in rotating order; two halves = two time blocks ----
+CFGS=6:2,8:2,10:2,12:2,14:2,8:3,8:4
+STUDY main_a cgmulti 6 2 "$RUNS/prompts_a.jsonl" 1 --skip-fetch --configs $CFGS || log "main_a failed (continuing)"
+STUDY main_b cgmulti 6 2 "$RUNS/prompts_b.jsonl" 1 --skip-fetch --configs $CFGS || log "main_b failed (continuing)"
+# eager-draft reference at depth 12 (per-prompt output sha vs the compiled d12 run; draft share is largest at d12 so a timing gap would show)
+STUDY eager cgmulti_eager 12 2 "$RUNS/prompts100.jsonl" 1 --skip-fetch || log "eager reference failed (continuing)"
+# run-to-run jitter: 20 prompts x 3 passes, d6 and d12 interleaved
+STUDY jitter cgmulti 6 2 "$RUNS/prompts20.jsonl" 3 --skip-fetch --configs 6:2,12:2 || log "jitter failed"
+# 192-token pass (reported separately): the three headline configurations, same prompts, same two halves
+MAXNEW=192 STUDY long_a cgmulti 6 2 "$RUNS/prompts_a.jsonl" 1 --skip-fetch --configs 6:2,8:2,12:2 || log "long_a failed"
+MAXNEW=192 STUDY long_b cgmulti 6 2 "$RUNS/prompts_b.jsonl" 1 --skip-fetch --configs 6:2,8:2,12:2 || log "long_b failed"
+# K=6 direct return on the 10-prompt subset (single-prompt engine: one coordinator process per prompt; stdin kept off the ssh)
+i=0; while read -r line <&3; do i=$((i+1)); PR=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["prompt"])' "$line"); mkdir -p "$RUNS/direct6/p$i"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/direct6/p$i/"
+  LR --mode direct6 --runs 1 --order "$ORDER" --skip-fetch --wait-timeout 180 --prompt "$PR" --out "$RUNS/direct6/p$i" < /dev/null || log "direct6 p$i failed"; done 3< "$RUNS/prompts10.jsonl"
+# traced calibration -> rebalanced plan, judged ABA against time-adjacent equal-block controls on the same 20 prompts
 STUDY trace_d6 cgmulti 6 2 "$RUNS/prompts10.jsonl" 1 --skip-fetch --trace || log "trace d6 failed"
 PLAN=$(python3 "$HERE/plan_from_traces.py" "$RUNS/trace_d6" 2> "$RUNS/plan.txt"); cat "$RUNS/plan.txt" | sed 's/^/    /'; log "PLAN $PLAN"
 if [ -n "$PLAN" ]; then
-  STUDY plan_d6_k2 cgmulti 6 2 "$PROMPTS" 1 --plan "$PLAN" || log "plan d6 failed (continuing)"          # fetch step runs: extra shards for the new blocks
-  STUDY plan_d12_k2 cgmulti 12 2 "$PROMPTS" 1 --plan "$PLAN" --skip-fetch || log "plan d12 failed (continuing)"
+  STUDY plan cgmulti 6 2 "$RUNS/prompts20.jsonl" 3 --plan "$PLAN" --configs 6:2,12:2 || log "plan failed (continuing)"     # fetch step runs: extra shards for the new blocks
   STUDY plan_trace_d12 cgmulti 12 2 "$RUNS/prompts10.jsonl" 1 --plan "$PLAN" --skip-fetch --trace || log "plan trace failed"
+  STUDY ctl cgmulti 6 2 "$RUNS/prompts20.jsonl" 1 --skip-fetch --configs 6:2,12:2 || log "control failed"               # equal blocks again, right after the plan
 fi
+# plain greedy (1 token per traversal) on the 10 prompts: the ground truth for the K=3/4 output differences; only with 25 min of cap left
+if [ $(( $(date +%s) - T0 )) -lt $((CAP_S - 1500)) ]; then
+  i=0; while read -r line <&3; do i=$((i+1)); PR=$(python3 -c 'import json,sys; print(json.loads(sys.argv[1])["prompt"])' "$line"); mkdir -p "$RUNS/cgplain/p$i"; cp "$RUNS/mesh/mesh_rtt.json" "$RUNS/cgplain/p$i/"
+    LR --mode cgplain --runs 1 --order "$ORDER" --skip-fetch --wait-timeout 180 --prompt "$PR" --out "$RUNS/cgplain/p$i" < /dev/null || log "cgplain p$i failed"; done 3< "$RUNS/prompts10.jsonl"
+else log "skipping the plain-greedy reference (cap)"; fi
 log "STUDY_DONE -> $RUNS"; trap - INT TERM; teardown; stats; exit 0   # bill stops first, then the report

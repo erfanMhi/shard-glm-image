@@ -28,7 +28,7 @@ Only cg/cgeager/cgplain have --dump (token ids -> sha256 check against the recei
 Example:
   python launch_ring.py --ids 1,2,3,4,5,6,7 --coord-id 7 --mode cg --runs 3 --trace --out runs/cg
 """
-import os, sys, json, time, shlex, hashlib, subprocess, argparse, concurrent.futures as cf
+import os, re, sys, json, time, shlex, hashlib, subprocess, argparse, concurrent.futures as cf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SHARD = os.environ.get("SHARD_REPO", os.path.join(os.path.dirname(HERE), "shard"))   # shard-glm-image/shard (no .git)
@@ -55,8 +55,8 @@ MODES = {
     "cgplain": dict(cls="ring",  cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --plain --prompt {prompt} --max-new {n}", dump=True, K=None),
     # multi-prompt study modes: one coordinator process runs every prompt of /root/prompts.jsonl (draft loaded once) and appends
     # a JSON line per generation to /root/results.jsonl, pulled into --out afterwards
-    "cgmulti":      dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --compile --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}", dump=False, K=2, multi=True),
-    "cgmulti_eager": dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}", dump=False, K=2, multi=True),
+    "cgmulti":      dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --compile --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}{configs}", dump=False, K=2, multi=True),
+    "cgmulti_eager": dict(cls="ring", cmd="glm_swarm_nvfp4_cg.py coord --stage {head} --ret-port {port} --depth {depth} --K {K} --prompts-file /root/prompts.jsonl --results /root/results.jsonl --repeat {repeat} --max-new {n}{configs}", dump=False, K=2, multi=True),
 }
 
 def log(*a):
@@ -200,9 +200,9 @@ def ensure_stages(chain, coord, ring, trace, timeout):
         log(f"  stage{i}: {'WARM in %.0fs' % info if ok else 'FAILED ' + str(info)[-600:]}")
         if not ok: raise RuntimeError(f"stage{i} did not warm")
 
-def coord_cmd(mode, head, prompt, n, K, depth, dump, repeat=1):
+def coord_cmd(mode, head, prompt, n, K, depth, dump, repeat=1, configs=""):
     m = MODES[mode]
-    cmd = m["cmd"].format(head=head, port=STAGE_PORT, prompt=shlex.quote(prompt), n=n, K=K, depth=depth, repeat=repeat)
+    cmd = m["cmd"].format(head=head, port=STAGE_PORT, prompt=shlex.quote(prompt), n=n, K=K, depth=depth, repeat=repeat, configs=(f" --configs {configs}" if configs else ""))
     if m["dump"] and dump: cmd += f" --dump {dump}"
     return cmd
 
@@ -239,6 +239,7 @@ def main():
     ap.add_argument("--allow-any-label", action="store_true", help="operate on instances whose label is not erfan-*")
     ap.add_argument("--prompts-file", default=None, help="cgmulti modes: local JSONL of prompts, pushed to the coordinator as /root/prompts.jsonl")
     ap.add_argument("--repeat", type=int, default=1, help="cgmulti modes: passes over the prompt set")
+    ap.add_argument("--configs", default="", help="cgmulti modes: interleave these depth:K configurations per prompt, e.g. 6:2,8:2,12:2")
     ap.add_argument("--plan", default="", help="explicit layers per stage in ring order, e.g. 10,15,16,14,14,9 (sums to 78); default: equal blocks")
     ap.add_argument("--auto-coord", action="store_true", help="after the RTT mesh, pick the coordinator that minimizes the loop cost (overrides --coord-id)")
     ap.add_argument("--mesh-only", action="store_true", help="measure the mesh, print the ring choice, write manifest, and exit")
@@ -358,7 +359,7 @@ def main():
     for i in range(a.runs):
         dump = f"/root/run_{a.mode}_{i}.json" if MODES[a.mode]["dump"] else None
         trace = f"/root/coord_trace_{a.mode}_{i}.jsonl" if a.trace else None
-        cmd = coord_cmd(a.mode, head, a.prompt, a.max_new, K, a.depth, dump, a.repeat)
+        cmd = coord_cmd(a.mode, head, a.prompt, a.max_new, K, a.depth, dump, a.repeat, a.configs)
         envp = f"COORD_TRACE={trace} " if trace else ""
         tag = f"d{a.depth}_k{K}{'' if a.mode == 'cgmulti' else '_eager'}_run{i}"
         keep = f"/root/results_{cfg}_{tag}.jsonl"                 # remote copy survives a failed pull (pull by hand before teardown)
@@ -384,12 +385,16 @@ def main():
                 with open(rp) as fi, open(os.path.join(a.out, f"results_{tag}.jsonl"), "w") as fo:
                     for ln in fi:
                         try:
-                            d = json.loads(ln); d.setdefault("config", cfg); d.setdefault("plan", a.plan or ""); fo.write(json.dumps(d) + "\n")
+                            d = json.loads(ln)
+                            base = f"d{d.get('depth', a.depth)}_k{d.get('K', K)}" + ("" if a.mode == "cgmulti" else "_eager")
+                            block = re.sub(r"_[ab]$", "", cfg)                         # main_a / main_b are two halves of one block
+                            d["config"] = base if block == "main" else f"{block}:{base}"; d["block"] = cfg; d.setdefault("plan", a.plan or "")
+                            fo.write(json.dumps(d) + "\n")
                             if d.get("tok_s") is not None: toks.append(float(d["tok_s"]))
                         except Exception: fo.write(ln)
                 os.remove(rp); r["results_file"] = f"results_{tag}.jsonl"
                 r["n_results"] = sum(1 for _ in open(os.path.join(a.out, f"results_{tag}.jsonl")))
-                r["n_expected"] = n_prompts * max(1, a.repeat); r["n_ok"] = len(toks)
+                r["n_expected"] = n_prompts * max(1, a.repeat) * (len(a.configs.split(",")) if a.configs else 1); r["n_ok"] = len(toks)
                 if toks: r["tok_s_last"] = r.get("tok_s"); r["tok_s"] = sorted(toks)[len(toks) // 2]   # the run's number = median over prompts, not the last GENERATED line
                 if r["n_ok"] < r["n_expected"]: log(f"    !! {r['n_ok']} successful generations of {r['n_expected']} expected ({r['n_results']} records; see errors in {r['results_file']})")
         if dump and os.path.exists(os.path.join(a.out, os.path.basename(dump))):
